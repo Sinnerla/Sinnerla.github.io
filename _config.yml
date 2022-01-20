@@ -104,4 +104,4 @@ theme: landscape
 deploy:
   type: git
   repo: git@github.com:Sinnerla/Sinnerla.github.io.git
-  branch: master
+  branch: main
