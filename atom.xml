@@ -10,7 +10,7 @@
   <id>https://sinnerla.github.io/</id>
   
   <author>
-    <name>John Doe</name>
+    <name>Sinnerla</name>
     
   </author>
   
@@ -18,8 +18,8 @@
   
   <entry>
     <title>Hello World</title>
-    <link href="https://sinnerla.github.io/2022/01/19/hello-world/"/>
-    <id>https://sinnerla.github.io/2022/01/19/hello-world/</id>
+    <link href="https://sinnerla.github.io/hello-world/01/19/2022/"/>
+    <id>https://sinnerla.github.io/hello-world/01/19/2022/</id>
     <published>2022-01-19T06:28:26.858Z</published>
     <updated>2022-01-19T06:28:26.858Z</updated>
     
