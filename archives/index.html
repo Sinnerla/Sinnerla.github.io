@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
+
+<head>
     <meta charset="UTF-8">
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -16,19 +17,12 @@
 
 
 
-
-
-<title>Archive | S&#39;Blog</title>
+<title>归档 | S&#39;Blog</title>
 
 
 
     <link rel="icon" href="../favicon.ico">
 
-
-
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Roboto+Mono&display=swap');
-</style>
 
 
 
@@ -39,116 +33,126 @@
 
 
 
-
     <!-- scripts list from _config.yml -->
     
-    <script src="../js/frame.js"></script>
+    <script src="../js/script.js"></script>
+    
+    <script src="../js/tocbot.min.js"></script>
     
 
 
 
+    
+    
+        
+    
 
 
-
-<script src='https://unpkg.com/valine@1.4.16/dist/Valine.min.js'></script>
-
-
-
-  <meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="atom.xml" title="S'Blog" type="application/atom+xml">
+<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="atom.xml" title="S'Blog" type="application/atom+xml">
 </head>
-  <body>
-    <div class="mask-border">
-    </div>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
 
     <div class="wrapper">
-
-      <div class="header">
-  <div class="flex-container">
-    <div class="header-inner">
-      <div class="site-brand-container">
-        <a href="../index.html">
-          
-            Frame.
-          
-        </a>
-      </div>
-      <div id="menu-btn" class="menu-btn" onclick="toggleMenu()">
-        Menu
-      </div>
-      <nav class="site-nav">
-        <ul class="menu-list">
-          
-            
-              <li class="menu-item">
-                <a href="../index.html">Home</a>
-              </li> 
-                   
-          
-            
-              <li class="menu-item">
-                <a href="../archives/">Archive</a>
-              </li> 
-                   
-          
-            
-              <li class="menu-item">
-                <a href="../categories/gallery/">Gallery</a>
-              </li> 
-                   
-          
-        </ul>
-      </nav>
-    </div>
-  </div>
-</div>
-
-
-      <div class="main">
-        <div class="flex-container">
-          <div class="post-list">
-    
-    
-
-        
-
-        
-            <div class="year-title">2022</div>
-        
-
-        <div class="post-list-item">
-            <div class="post-title">
-            <a href="../hello-world/01/19/2022/">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Bentham&#39;s Blog</a></div>
+            <div class="menu navbar-right">
                 
-                    Hello World
+                    <a class="menu-item" href="../archives">Posts</a>
                 
-                </a> 
+                    <a class="menu-item" href="../category">Categories</a>
+                
+                    <a class="menu-item" href="../tag">Tags</a>
+                
+                    <a class="menu-item" href="../about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
             </div>
-            
-            <span class="post-date">1月 19, 2022</span>
         </div>
+    </nav>
 
     
-    <div id="paginator">
-        
-    </div>
-</div>
-
-        </div>
-      </div>
-      
-      <div class="footer">
-    <div class="flex-container">
-        <div class="footer-text">
-            
-            
-            
-                Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/zoeingwingkei/frame/">Frame</a>
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Bentham&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
                 
+                    <a class="menu-item" href="../archives">Posts</a>
+                
+                    <a class="menu-item" href="../category">Categories</a>
+                
+                    <a class="menu-item" href="../tag">Tags</a>
+                
+                    <a class="menu-item" href="../about">About</a>
+                
+            </div>
         </div>
-    </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="post-wrap archive">
+    
+    
+        
+
+        
+            <h3>2022</h3>
+        
+
+        <article class="archive-item">
+            <a class="archive-item-link" href="../hello-world/01/19/2022/">Hello World</a>
+            <span class="archive-item-date">一月 19, 2022</span>
+        </article>
+    
+    
 </div>
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Sinnerla | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
 
     </div>
+</body>
 
-  </body>
 </html>
