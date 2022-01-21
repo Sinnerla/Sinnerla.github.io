@@ -2,11 +2,11 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>S&#39;Blog</title>
   
-  <subtitle>hello, nice to see you</subtitle>
+  <subtitle>你好你好，潲水洗澡</subtitle>
   <link href="https://sinnerla.github.io/atom.xml" rel="self"/>
   
   <link href="https://sinnerla.github.io/"/>
-  <updated>2022-01-19T06:28:26.858Z</updated>
+  <updated>2022-01-21T05:44:11.179Z</updated>
   <id>https://sinnerla.github.io/</id>
   
   <author>
@@ -15,6 +15,19 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>photograph</title>
+    <link href="https://sinnerla.github.io/photograph/01/21/2022/"/>
+    <id>https://sinnerla.github.io/photograph/01/21/2022/</id>
+    <published>2022-01-21T05:44:11.000Z</published>
+    <updated>2022-01-21T05:44:11.179Z</updated>
+    
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>Hello World</title>
