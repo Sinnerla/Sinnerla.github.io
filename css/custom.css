@@ -1,0 +1,35 @@
+/*gallery*/
+.gallery-album {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+.album-item {
+  margin-top: 100px;
+}
+.album-item p {
+  margin: 10px auto 10px;
+  max-width: 100%;
+  text-align: center;
+  font-size: 18px;
+  color: $black-deep;
+  background: rgba(255,255,255,0.3);
+  border-radius: 7px;
+  border: 1px solid $black-deep;
+}
+.posts-expand .post-body .gallery-album a img {
+  height: 250px;
+  width: 300px;
+  object-fit: contain;
+}
+@media (max-width: 767px) {
+  .album-item p {
+    min-width: 75px;
+    font-size: 13px;
+  }
+}
+.gt-container {
+  max-width: 780px;
+  margin: auto;
+}

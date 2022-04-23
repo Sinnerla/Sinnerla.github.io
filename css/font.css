@@ -1,0 +1,7 @@
+@font-face {
+  font-family: 'weilaiyinghei';
+  src: url("../fonts/weilaiyinghei/weilaiyinghei.otf"); /* IE9 */
+  src: url("../fonts/weilaiyinghei/weilaiyinghei.eot") format('embedded-opentype'), url("../fonts/weilaiyinghei/weilaiyinghei.woff2") format('woff2'), url("../fonts/weilaiyinghei/weilaiyinghei") format('woff'), url("../fonts/weilaiyinghei/weilaiyinghei.ttf") format('truetype'); /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
+  font-weight: 300;
+  font-display: swap;
+}
