@@ -17,33 +17,33 @@
 
 
 
-<title>Tag: white | S&#39;Blog</title>
+<title>目录 | S&#39;Blog</title>
 
 
 
-    <link rel="icon" href="../../favicon.ico">
+    <link rel="icon" href="../favicon.ico">
 
 
 
 
     <!-- stylesheets list from _config.yml -->
     
-    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
     
 
 
 
     <!-- scripts list from _config.yml -->
     
-    <script src="../../js/script.js"></script>
+    <script src="../js/script.js"></script>
     
-    <script src="../../js/tocbot.min.js"></script>
+    <script src="../js/tocbot.min.js"></script>
     
-    <script src="../../js/md5.min.js"></script>
+    <script src="../js/md5.min.js"></script>
     
-    <script src="../../js/loveclick.js"></script>
+    <script src="../js/loveclick.js"></script>
     
-    <script src="../../js/jquery.min.js"></script>
+    <script src="../js/jquery.min.js"></script>
     
 
 <!-- 搜索的部分 -->
@@ -245,17 +245,17 @@ $(document).ready(function() {
           <input class="input" placeholder="Search!" autocomplete="off" id="pc-search-input"/>
       </form>
         <div class="search-btn" onClick="searchToggle()">
-            <img src="../../image/search.png" class="search-btn-img" />
+            <img src="../image/search.png" class="search-btn-img" />
         </div>
     </div>
 
 
             
-            <a class="menu-item" href="../../archives">Posts</a>
+            <a class="menu-item" href="../archives">Posts</a>
             
-            <a class="menu-item" href="../../category">Categories</a>
+            <a class="menu-item" href="../category">Categories</a>
             
-            <a class="menu-item" href="../../gallery">Gallery</a>
+            <a class="menu-item" href="../gallery">Gallery</a>
             
         </div>
     </div>
@@ -275,11 +275,11 @@ $(document).ready(function() {
             </div>
             <div class="menu" id="mobile-menu">
                 
-                    <a class="menu-item" href="../../archives">Posts</a>
+                    <a class="menu-item" href="../archives">Posts</a>
                 
-                    <a class="menu-item" href="../../category">Categories</a>
+                    <a class="menu-item" href="../category">Categories</a>
                 
-                    <a class="menu-item" href="../../gallery">Gallery</a>
+                    <a class="menu-item" href="../gallery">Gallery</a>
                 
             </div>
         </div>
@@ -301,31 +301,169 @@ $(document).ready(function() {
 </script>
 
             <div class="main">
-                <!-- 标签（Tag）页 -->
-
-    
+                
 <div class="container">
-    <div class="post-wrap tags">
-        <h2 class="post-title">-&nbsp;Tag&nbsp;·&nbsp;white-</h2>
+
+
+  <div class="post-toc">
+    <div class="tocbot-list">
     </div>
-    <div class="post-wrap archive">
-    
-    
-        
-
-        
-            <h3>2022</h3>
-        
-
-        <article class="archive-item">
-            <a class="archive-item-link" href="../../article/733bf688.html">空壳自白</a>
-            <span class="archive-item-date">26 January, 2022</span>
-        </article>
-    
-    
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
 </div>
 
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+</script>
+
+  
+
+<article class="post-wrap">
+  <header class="post-header">
+    <h1 class="post-title">目录</h1><br/>
+    
+      <div class="post-meta">
+        
+          Author:  <a itemprop="author" rel="author" href="/">Sinnerla</a>
+          <br/>
+          
+            <span class="post-time">
+              Date:  <a href="#">29 January, 2022&nbsp;&nbsp;15:06:15</a>
+            </span>
+            <br/>
+            
+              <span class="post-category">
+                Category:
+                
+                  <a href="../categories/shining/">shining</a>
+                  
+                </span>
+                
+              </div>
+              
+            </header>
+ <div class="post-content">
+   <h1 id="起点"><a href="#起点" class="headerlink" title="起点"></a>起点</h1><h2 id="混沌能量撑开天地"><a href="#混沌能量撑开天地" class="headerlink" title="混沌能量撑开天地"></a>混沌能量撑开天地</h2><h3 id="天地初开"><a href="#天地初开" class="headerlink" title="天地初开"></a>天地初开</h3><ul>
+<li><p>混沌能量碰撞组合</p>
+<ul>
+<li><p>生灵诞生</p>
+<ul>
+<li>各部族初步形成</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="世界意识"><a href="#世界意识" class="headerlink" title="世界意识"></a>世界意识</h2><h2 id="生灵意识"><a href="#生灵意识" class="headerlink" title="生灵意识"></a>生灵意识</h2><h2 id="游离能量体"><a href="#游离能量体" class="headerlink" title="游离能量体"></a>游离能量体</h2><h2 id="圣安会"><a href="#圣安会" class="headerlink" title="圣安会"></a>圣安会</h2><h3 id="白化公主"><a href="#白化公主" class="headerlink" title="白化公主"></a>白化公主</h3><h2 id="圣安魔女"><a href="#圣安魔女" class="headerlink" title="圣安魔女"></a>圣安魔女</h2><h2 id="人类"><a href="#人类" class="headerlink" title="人类"></a>人类</h2><h2 id="螭离"><a href="#螭离" class="headerlink" title="螭离"></a>螭离</h2><h2 id="黑龙"><a href="#黑龙" class="headerlink" title="黑龙"></a>黑龙</h2><h2 id="崩坏通天塔"><a href="#崩坏通天塔" class="headerlink" title="崩坏通天塔"></a>崩坏通天塔</h2><h2 id="通天塔"><a href="#通天塔" class="headerlink" title="通天塔"></a>通天塔</h2><h3 id="塔族"><a href="#塔族" class="headerlink" title="塔族"></a>塔族</h3><ul>
+<li>语言分散</li>
+</ul>
+<p><em>XMind - Trial Version</em></p>
+
+ </div>
+ 
+   <section class="post-copyright">
+     
+       <div class="copyright-item">
+         <span>Author:  </span>
+         <span>Sinnerla</span>
+       </div>
+       
+     
+     
+     
+     </section>
+     
+   <section class="post-tags">
+     <div>
+       <span>Tag:  </span>
+       <span class="tag">
+         
+       </span>
+     </div>
+     <div>
+       <a href="javascript:window.history.back();">back</a>
+       <span>· </span>
+       <a href="/">home</a>
+     </div>
+   </section>
+   <section class="post-nav">
+     
+       <a class="prev" rel="prev" href="3f67b87c.html">一些细节</a>
+       
+     
+       <a class="next" rel="next" href="9fedcb59.html">奇怪</a>
+       
+    </section>
+</article>
 </div>
+
+
+ <div id="gitalk-container"></div>
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+ var gitalk = new Gitalk({
+ clientID: '1ef6686ae0caacdc40c6',
+ clientSecret: '4ba0ba87d81338047baa13bc94f52adac3555323',
+ repo: 'Gitalk_Date',
+ owner: 'Sinnerla',
+ admin: 'Sinnerla',
+ id: md5(location.pathname),
+ labels: 'Gitalk'.split(',').filter(l => l),
+ perPage: 10,
+ pagerDirection: 'last',
+ createIssueManually: true,
+ distractionFreeMode: true
+ })
+ gitalk.render('gitalk-container')
+</script>
 
 
 
@@ -349,7 +487,7 @@ $(document).ready(function() {
             <div class="container">
                 <form id="u-search-modal-form" class="u-search-modal-form">
                     <button type="submit" class="form-submit-btn">
-                        <img src="../../image/find.png" class="search-btn-img" />
+                        <img src="../image/find.png" class="search-btn-img" />
                     </button>
                     <input placeholder="Search!" class="form-input" id="modal-form-input">
                 </form>
