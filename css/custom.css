@@ -33,3 +33,33 @@
   max-width: 780px;
   margin: auto;
 }
+.gt-container .gt-btn-login {
+  background-color: $background-color;
+  border: 1px solid $background-color;
+}
+.gt-container .gt-btn-public {
+  background-color: $background-color;
+  border: 1px solid $background-color;
+}
+.gt-container .gt-btn-public:hover {
+  background-color: #25cdd0;
+  border: 1px solid $background-color;
+}
+.gt-container .gt-btn {
+  border: 1px solid $background-color;
+}
+.gt-container a {
+  color: $background-color;
+}
+.gt-container .gt-btn-preview:hover {
+  border: 1px solid $background-color;
+}
+.gt-container .gt-svg svg {
+  fill: $background-color;
+}
+.gt-container .gt-comment-username {
+  color: $background-color;
+}
+.gt-container .gt-popup .gt-action.is--active:before {
+  background: $background-color;
+}
