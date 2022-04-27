@@ -40,9 +40,8 @@
     
     <script src="../../js/tocbot.min.js"></script>
     
-    <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
     
-
 
 
 
@@ -69,7 +68,7 @@
         }
     }
     function search(searchInputEl, formEl, flag) {
-        const path = "/" + "/public/search.json"; // 可以在public 下查看这个search.json
+        const path = "/" + "search.json"; // 可以在public 下查看这个search.json
         $(formEl).submit(function(e){
             e.preventDefault();
             let target = null

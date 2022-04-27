@@ -12,15 +12,16 @@
 
 #u-search .modal {
     position: fixed;
-    height: 80%;
+    height: 100%;
     width: 100%;
+    max-height: 640px;
     max-width: 640px;
     left: 50%;
     top: 0;
     margin: 64px 0px 0px -320px;
-    background: #fff;
+    background: #ffffff;
     z-index: 3;
-    border-radius: 4px;
+    border-radius: 5px;
     overflow: hidden;
 }
 
@@ -31,9 +32,9 @@
     z-index: 3;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
-    font-size: 16px;
+    font-size: 14px;
     box-shadow: 0 1px 2px 0px rgba(0,0,0,0.1);
-    background: #fff;
+    background: #ffffff;
     transition: all 0.28s ease;
     -moz-transition: all 0.28s ease;
     -webkit-transition: all 0.28s ease;
@@ -55,7 +56,7 @@
 }
 
 #u-search .u-search-modal-form .form-submit-btn {
-    width: 50px;
+    width: 64px;
     height: 64px;
     background: none;
     border: none;
@@ -65,12 +66,12 @@
 
 #u-search .u-search-modal-form .form-submit-btn img {
     width: 33px;
-    height: 33px;
+    height: 30px;
 }
 
 #u-search .modal-header .container .u-search-modal-form .form-input {
     flex: 1;
-    margin-right: 15px;
+    margin-right: 10px;
     border: none;
     padding: 10px 10px;
     outline: none;
@@ -79,11 +80,11 @@
 
 #u-search .modal-header .modal-close {
     display: block;
-    width: 55px;
-    height: 64px;
+    width: 64px;
+    height: 32px;
     top: 0;
     right: 0;
-    color: #2196f3;
+    color: #ea9999;
     cursor: pointer;
     text-align: center;
     line-height: 64px;
@@ -116,7 +117,7 @@
     display: none;
     width: 0%;
     height: 100%;
-    background: #2196f3;
+    background: #ea9999;
 
 }
 
@@ -137,14 +138,14 @@
     border-radius:2px;
 }
 #u-search .modal .modal-body::-webkit-scrollbar-thumb{
-    background: #bfbfbf;
+    background: #efefef;
     border-radius:10px;
 }
 #u-search .modal .modal-body::-webkit-scrollbar-thumb:hover{
     background: #333;
 }
 #u-search .modal .modal-body::-webkit-scrollbar-corner{
-    background: #179a16;
+    background: #ea9999;
 }
 
 #u-search .modal .modal-body .modal-results {
@@ -158,7 +159,7 @@
 }
 
 #u-search .modal .modal-body .modal-results .result-item:hover {
-    background: #e8f4fd;
+    background: #ffdddd;
 }
 
 #u-search .modal .modal-body .modal-results .result-item .result-item-detail {
@@ -167,7 +168,7 @@
 }
 
 #u-search .modal .modal-body .modal-results .result-item .result-item-detail .title {
-    color: #6e6e6e;
+    color: #d9d9d9;
     font-weight: 700;
     font-size: 18px;
     margin-bottom: 10px;
@@ -185,7 +186,7 @@
 }
 
 #u-search .search-keyword {
-    color: #0c7cd5;
+    color: #ea9999;
     text-decoration: underline;
     font-weight: bold;
     font-style:normal
@@ -205,7 +206,7 @@
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,0.7);
-    z-index: 100;
+    z-index: 1;
 }
 
 @media screen and (max-width: 680px) {
@@ -237,11 +238,6 @@
     bottom: 0;
 }
 
-
-
-
-
-
 /* 以下是搜索框 */
 .search {
     margin-right: 6px;
@@ -251,18 +247,18 @@
 }
 
 .search .form-search {
-    padding: 10px 8px;
+    padding: 10px 10px;
 }
 
 .search .form-search .input {
     display: block;
-    line-height: 1.3;
-    color: #555;
-    background: #e8e8e8;
+    line-height: 0.5;
+    color: #ffffff;
+    background: #efefef;
     padding: 5px 8px;
     box-shadow: none;
     box-sizing: border-box;
-    font-size: 1rem;
+    font-size: 0.5rem;
     border-radius: 8px;
     border: none;
     outline: none;
