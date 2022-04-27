@@ -296,100 +296,535 @@
 
             <div class="main">
                 <!-- 关于（About）页 -->
-<link rel="stylesheet" href="source/css/_page/about.css">
-		<!-- Main -->
-			<div id="main">
-				<!-- One -->
-					<section id="one">
-						<header class="major">
-							<h2>Ipsum lorem dolor aliquam ante commodo<br />
-							magna sed accumsan arcu neque.</h2>
-						</header>
-						<p>Accumsan orci faucibus id eu lorem semper. Eu ac iaculis ac nunc nisi lorem vulputate lorem neque cubilia ac in adipiscing in curae lobortis tortor primis integer massa adipiscing id nisi accumsan pellentesque commodo blandit enim arcu non at amet id arcu magna. Accumsan orci faucibus id eu lorem semper nunc nisi lorem vulputate lorem neque cubilia.</p>
-						<ul class="actions">
-							<li><a href="#" class="button">Learn More</a></li>
-						</ul>
-					</section>
-				<!-- Two -->
-					<section id="two">
-						<h2>Recent Work</h2>
-						<div class="row">
-							<article class="col-6 col-12-xsmall work-item">
-								<a href="images/fulls/01.jpg" class="image fit thumb"><img src="images/thumbs/01.jpg" alt="" /></a>
-								<h3>Magna sed consequat tempus</h3>
-								<p>Lorem ipsum dolor sit amet nisl sed nullam feugiat.</p>
-							</article>
-							<article class="col-6 col-12-xsmall work-item">
-								<a href="images/fulls/02.jpg" class="image fit thumb"><img src="images/thumbs/02.jpg" alt="" /></a>
-								<h3>Ultricies lacinia interdum</h3>
-								<p>Lorem ipsum dolor sit amet nisl sed nullam feugiat.</p>
-							</article>
-							<article class="col-6 col-12-xsmall work-item">
-								<a href="images/fulls/03.jpg" class="image fit thumb"><img src="images/thumbs/03.jpg" alt="" /></a>
-								<h3>Tortor metus commodo</h3>
-								<p>Lorem ipsum dolor sit amet nisl sed nullam feugiat.</p>
-							</article>
-							<article class="col-6 col-12-xsmall work-item">
-								<a href="images/fulls/04.jpg" class="image fit thumb"><img src="images/thumbs/04.jpg" alt="" /></a>
-								<h3>Quam neque phasellus</h3>
-								<p>Lorem ipsum dolor sit amet nisl sed nullam feugiat.</p>
-							</article>
-							<article class="col-6 col-12-xsmall work-item">
-								<a href="images/fulls/05.jpg" class="image fit thumb"><img src="images/thumbs/05.jpg" alt="" /></a>
-								<h3>Nunc enim commodo aliquet</h3>
-								<p>Lorem ipsum dolor sit amet nisl sed nullam feugiat.</p>
-							</article>
-							<article class="col-6 col-12-xsmall work-item">
-								<a href="images/fulls/06.jpg" class="image fit thumb"><img src="images/thumbs/06.jpg" alt="" /></a>
-								<h3>Risus ornare lacinia</h3>
-								<p>Lorem ipsum dolor sit amet nisl sed nullam feugiat.</p>
-							</article>
-						</div>
-						<ul class="actions">
-							<li><a href="#" class="button">Full Portfolio</a></li>
-						</ul>
-					</section>
+<style>
 
-				<!-- Three -->
-					<section id="three">
-						<h2>Get In Touch</h2>
-						<p>Accumsan pellentesque commodo blandit enim arcu non at amet id arcu magna. Accumsan orci faucibus id eu lorem semper nunc nisi lorem vulputate lorem neque lorem ipsum dolor.</p>
-						<div class="row">
-							<div class="col-8 col-12-small">
-								<form method="post" action="#">
-									<div class="row gtr-uniform gtr-50">
-										<div class="col-6 col-12-xsmall"><input type="text" name="name" id="name" placeholder="Name" /></div>
-										<div class="col-6 col-12-xsmall"><input type="email" name="email" id="email" placeholder="Email" /></div>
-										<div class="col-12"><textarea name="message" id="message" placeholder="Message" rows="4"></textarea></div>
-									</div>
-								</form>
-								<ul class="actions">
-									<li><input type="submit" value="Send Message" /></li>
-								</ul>
-							</div>
-							<div class="col-4 col-12-small">
-								<ul class="labeled-icons">
-									<li>
-										<h3 class="icon solid fa-home"><span class="label">Address</span></h3>
-										1234 Somewhere Rd.<br />
-										Nashville, TN 00000<br />
-										United States
-									</li>
-									<li>
-										<h3 class="icon solid fa-mobile-alt"><span class="label">Phone</span></h3>
-										000-000-0000
-									</li>
-									<li>
-										<h3 class="icon solid fa-envelope"><span class="label">Email</span></h3>
-										<a href="#">hello@untitled.tld</a>
-									</li>
-								</ul>
-							</div>
-						</div>
-					</section>
-			</div>
-	</body>
-</html>
+article,
+aside,
+details,
+figcaption,
+figure,
+hgroup,
+main,
+menu,
+section,
+summary {
+  display: block;
+}
+
+
+audio,
+canvas,
+progress,
+video {
+  display: inline-block;
+  /* 1 */
+  vertical-align: baseline;
+  /* 2 */
+}
+
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+
+[hidden],
+template {
+  display: none;
+}
+
+a {
+  background-color: transparent;
+}
+
+a:active,
+a:hover {
+  outline: 0;
+}
+
+abbr[title] {
+  border-bottom: 1px dotted;
+}
+
+b,
+strong {
+  font-weight: bold;
+}
+
+dfn {
+  font-style: italic;
+}
+
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+
+mark {
+  background: #ff0;
+  color: #000;
+}
+
+small {
+  font-size: 80%;
+}
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+sup {
+  top: -0.5em;
+}
+sub {
+  bottom: -0.25em;
+}
+img {
+  border: 0;
+}
+
+svg:not(:root) {
+  overflow: hidden;
+}
+
+figure {
+  margin: 1em 40px;
+}
+hr {
+  box-sizing: content-box;
+  height: 0;
+}
+pre {
+  overflow: auto;
+}
+code,
+kbd,
+pre,
+samp {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+button,
+input,
+optgroup,
+select,
+textarea {
+  color: inherit;
+  /* 1 */
+  font: inherit;
+  /* 2 */
+  margin: 0;
+  /* 3 */
+}
+button {
+  overflow: visible;
+}
+button,
+select {
+  text-transform: none;
+}
+button,
+html input[type=button],
+input[type=reset],
+input[type=submit] {
+  -webkit-appearance: button;
+  /* 2 */
+  cursor: pointer;
+  /* 3 */
+}
+button[disabled],
+html input[disabled] {
+  cursor: default;
+}
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+input {
+  line-height: normal;
+}
+input[type=checkbox],
+input[type=radio] {
+  box-sizing: border-box;
+  /* 1 */
+  padding: 0;
+  /* 2 */
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  height: auto;
+}
+input[type=search] {
+  -webkit-appearance: textfield;
+  /* 1 */
+  box-sizing: content-box;
+  /* 2 */
+}
+input[type=search]::-webkit-search-cancel-button,
+input[type=search]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+fieldset {
+  border: 1px solid #c0c0c0;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em;
+}
+legend {
+  border: 0;
+  /* 1 */
+  padding: 0;
+  /* 2 */
+}
+textarea {
+  overflow: auto;
+}
+optgroup {
+  font-weight: bold;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+td,
+th {
+  padding: 0;
+}
+div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption,hgroup,
+menu, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+article, aside, details, figcaption, figure,
+hgroup, menu, section {
+  display: block;
+}
+
+body {
+  line-height: 1;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: "";
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+::selection {
+  background: #999;
+  /* WebKit/Blink Browsers */
+  color: white;
+}
+
+::-moz-selection {
+  background: #999;
+  /* Gecko Browsers */
+  color: white;
+}
+
+@media all and (max-width: 1000px) {
+  body {
+    font-size: 15px;
+  }
+}
+
+.wrapper {
+  z-index: 99;
+  margin: 1% 38% 12% 8%;
+}
+@media all and (max-width: 1000px) {
+  .wrapper {
+    margin: 5%;
+  }
+}
+
+.left {
+  width: 60%;
+  margin-right: 8%;
+  display: inline-block;
+  float: left;
+}
+@media all and (max-width: 1000px) {
+  .left {
+    width: 100%;
+  }
+}
+
+.right {
+  width: 48%;
+  display: inline-block;
+}
+@media all and (max-width: 1000px) {
+  .right {
+    width: 100%;
+  }
+}
+
+h1 {
+  font-size: 1.7em;
+  font-weight: 900;
+  line-height: 1.2em;
+  letter-spacing: -0.01em;
+  margin-bottom: 20px;
+}
+@media all and (max-width: 1000px) {
+  h1 {
+    font-size: 2em;
+  }
+}
+
+h2, h3 {
+  font-weight: 900;
+  margin: 60px 0 20px;
+}
+h2 i, h3 i {
+  font-style: italic;
+}
+a {
+  color: #999;
+}
+a:hover {
+  color: white;
+  text-decoration: none;
+}
+a:focus {
+  color: yellow;
+}
+a:active {
+  color: yellow;
+}
+
+p {
+  margin-bottom: 3%;
+  margin-right: 2%;
+}
+p i {
+  font-style: italic;
+}
+
+ul {
+  margin-bottom: 10%;
+}
+ul li {
+  width: 100%;
+  padding: 8px 0;
+  border-bottom: 1px #999 solid;
+}
+ul li span {
+  line-height: 0.9;
+  padding-bottom: 0.25em;
+}
+ul li a {
+  text-decoration: none;
+}
+ul li .dash {
+  flex: 2;
+  justify-self: stretch;
+  margin: 0 1em;
+  min-width: 2em;
+  height: 2px;
+  padding-bottom: 0;
+  background: currentColor;
+}
+@media all and (max-width: 1000px) {
+  ul li {
+    float: left;
+  }
+}
+ul li small {
+  float: right;
+  margin-left: 5px;
+  font-size: 0.8em;
+  opacity: 0.5;
+}
+@media all and (max-width: 1000px) {
+  ul li small {
+    display: block;
+    width: 100%;
+  }
+}
+
+</style>
+
+
+<div class="wrapper">
+	<h1>
+		关于我 <a target="_blank" rel="noopener" href="https://www.rekki.com">Sinnerla</a></br>
+		一个半吊子设计师<a target="_blank" rel="noopener" href="https://www.wetransfer.com">什么都会一点，真的只有一点</a></br>
+		互联网特级冲浪选手<a target="_blank" rel="noopener" href="https://www.wetransfer.com">哪里有瓜，哪里有我</a></br>
+		熟练掌握各种摸鱼技巧<a target="_blank" rel="noopener" href="https://www.wetransfer.com">但是深藏不露</a></br>
+    </br>
+		你可能会在以下的任意地点发现我</br>
+		<a target="_blank" rel="noopener" href="https://www.wetransfer.com">微博</a></br>
+		<a target="_blank" rel="noopener" href="https://www.wetransfer.com">豆瓣</a></br>
+		<a target="_blank" rel="noopener" href="https://www.wetransfer.com">知乎</a></br>
+		<a target="_blank" rel="noopener" href="https://www.wetransfer.com">百度贴吧</a></br>
+		<a target="_blank" rel="noopener" href="https://www.wetransfer.com">TapTap社区</a></br>
+		<a target="_blank" rel="noopener" href="https://www.wetransfer.com">steam社区</a></br>
+		<a target="_blank" rel="noopener" href="https://www.wetransfer.com">A站</a></br>
+		<a target="_blank" rel="noopener" href="https://www.wetransfer.com">B站</a></br>
+		<a target="_blank" rel="noopener" href="https://www.wetransfer.com">推特</a></br>
+		<a target="_blank" rel="noopener" href="https://www.wetransfer.com">ins</a></br>
+		<a target="_blank" rel="noopener" href="https://www.wetransfer.com">油管</a></br>
+ </h1>
+	<h2>
+		想要精准找到我？</br>
+		请联系<a href="mailto:thomasschrijer@gmail.com">QQ</a>
+		or <a href="mailto:thomasschrijer@gmail.com">Wechat</a>
+		or <a href="mailto:thomasschrijer@gmail.com">Email</a>
+		</br>
+		特别着急？</br>
+		好吧，谁让我美丽又热心肠<a href="mailto:thomasschrijer@gmail.com">My phone</a>
+		不过有可能欠费，提供一下备选项：<a href="mailto:thomasschrijer@gmail.com">phone 2</a>
+  </h2>
+
+	<h2>Selected work</h2>
+	<ul>
+		<li>
+			<a href="https://about.wetransfer.com" target="blank">WeTransfer Brand Site</a>
+			<small>UX/UI</small>
+		</li>
+		<li>
+			<a href="https://www.grillitype.com/commissions/wetransfer" target="blank">WeTransfer Brand Typeface w/ Grilli Type</a>
+			<small>Art Direction</small>
+		</li>
+		<li>
+			<a href="https://wepresent.wetransfer.com" target="blank">WePresent</a>
+			<small>Strategy, Branding, Art Direction</small>
+		</li>
+		<li>
+			<a href="https://twitter.com/charrrlotte_w/status/964439078908452864" target="blank">WeTransfer Spot Illustrations</a>
+			<small>Art Direction</small>
+		</li>
+		<li>
+			<a href="https://thomasschrijer.wetransfer.com" target="blank">wetransfer.com</a>
+			<small>Branding, UX/UI</small>
+		</li>
+		<li>
+			<a href="https://we.tl/macapp" target="blank">WeTransfer macOS app</a>
+			<small>UX/UI</small>
+		</li>
+		<li>
+			<a href="https://datumprikker.nl" target="blank">datumprikker.nl</a>
+			<small>Branding, UX/UI</small>
+		</li>
+		<li>
+			<a href="http://www.rijkswaterstaat.nl" target="blank">rijkswaterstaat.nl</a>
+			<small>UX/UI</small>
+		</li>
+		<li>
+			<a href="http://top10.thomasschrijer.com" target="blank">Top 10 Albums</a>
+			<small>Personal</small>
+		</li>
+	</ul>
+
+	<h2>A bit about me (and my thinking)</h2>
+	<p>
+		I’m a system thinker by nature, looking at the bigger picture to come up with holistic solutions. I have a healthy obsession with searching for new angles, but I always come back to the same question: how do things connect?
+	</p>
+	<p>
+		“Are you a product or brand designer?” That old question. I’ve worn multiple hats on the spectrum between the two. How I see it is that the two need to be closely intertwined to create the best experience, to tailor to the audience and to stand out from the crowd.
+	</p>
+	<p>
+		Digital products nowadays tend to blend into each other. I think it’s time to make the online space more daring and emotional again.
+	</p>
+	<p>
+		I believe that stories and narratives are key to create good design - that’s why I like to take inspiration from graphic and editorial design (and don’t forget about my crush typography).
+	</p>
+	<h2>Experience</h2>
+	<p>
+		In my five years at WeTransfer I designed for multiple parts of the business while it grew from start up to scale up.
+	</p>
+	<p>
+		After acquiring Paper and Paste from FiftyThree in 2018, WeTransfer evolved into a set of creative tools. I led the direction for the brand language towards this change, defining core brand elements, product identities and guidelines while leading a team of 3 in-house designers and external design experts.
+	</p>
+	<p>
+		As part of the WeTransfer Studio I’ve directed and designed multiple branding and content projects. I’ve helped lay out the foundation and art direction of the content platform <a target="_blank" rel="noopener" href="https://wepresent.wetransfer.com/">WePresent</a>.
+	</p>
+	<p>
+		As part of the product design team, I re-designed the wetransfer.com experience and subscription offering. After that I was part of defining a vision for WeTransfer on mobile, which later evolved into <a target="_blank" rel="noopener" href="https://collect.bywetransfer.com/">Collect by WeTransfer</a>.
+	</p>
+	<p>
+		Before that I’ve at worked at smaller digital agencies like <a target="_blank" rel="noopener" href="https://www.presentplus.com">Present Plus</a> and <a target="_blank" rel="noopener" href="https://www.eight.nl">Eight Media</a>, designing the brand and UX experiences for datumprikker, rijkswaterstaat and more.
+	</p>
+	<p>
+	</p>
+
+	<h2>Talks & Features</h2>
+	<ul>
+		<li>
+			<a href="https://restinprogress.substack.com/p/issue-1-thomas-schrijer-and-vergeten" target="blank">Interview with Rest In Progress Newsletter</a>
+			<small>2020</small>
+		</li>
+		<li>
+			<a href="https://www.fontanelmagazine.com/chats/thomas-schrijer" target="blank">Interview with Fontanel</a>
+			<small>2019</small>
+		</li>
+		<li>
+			<a href="https://www.youtube.com/watch?v=8f7_IP8kjO8&t=534s" target="blank">Talk at DesignMatters</a>
+			<small>Copenhagen, 2019</small>
+		</li>
+		<li>
+			<a href="https://youtu.be/CavyeP8eTto" target="blank">Talk at Dutch Design Week</a>
+			<small>Eindhoven, 2019</small>
+		</li>
+		<li>
+			<a href="https://www.openvrt.be/" target="blank">Talk at OpenVRT</a>
+			<small>Brussels, 2019</small>
+		</li>
+		<li>
+			<a href="https://lava.nl/" target="blank">Talk at Lava</a>
+			<small>Amsterdam, 2019</small>
+		</li>
+		<li>
+			<a href="https://www.adcn.nl/awards" target="blank">Jury Member, ADCN</a>
+			<small>Amsterdam, 2019</small>
+		</li>
+		<li>
+			<a href="https://nicelydone.club/interviews/thomas-schrijer-design-director-at-wetransfer-netherlands" target="blank">Interview with Nicelydone.club</a>
+			<small>2017</small>
+		</li>
+	</ul>
+
+	<h2>The stuff you came for in the first place</h2>
+	<ul>
+		<li><a href="https://www.twitter.com/thomasschrijer" target="blank">Twitter</a></li>
+		<li><a href="https://www.instagram.com/thomasschrijer" target="blank">Instagram</a></li>
+		<li><a href="https://www.linkedin.com/in/thomasschrijer/" target="blank">LinkedIn</a></li>
+		<li><a href="https://www.are.na/thomas-schrijer-1522072246" target="blank">Are.na</a></li>
+		<li><a href="mailto:thomasschrijer@gmail.com" target="blank">Electronic mail</a></li>
+	</ul>
 
             </div>
             <!--页脚-->
