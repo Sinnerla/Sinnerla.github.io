@@ -40,8 +40,6 @@
     
     <script src="../../../js/tocbot.min.js"></script>
     
-    <script src="../../../js/md5.min.js"></script>
-    
     <script src="../../../js/loveclick.js"></script>
     
     <script src="../../../js/jquery.min.js"></script>
@@ -406,27 +404,27 @@
 </footer>
 
     </div>
-</body>
-<!-- 搜索功能 -->
-<div id="u-search">
-    <div class="modal">
-        <div class="modal-header">
-            <div class="container">
-                <form id="u-search-modal-form" class="u-search-modal-form">
-                    <button type="submit" class="form-submit-btn">
-                        <img src="../../../image/find.png" class="search-btn-img" />
-                    </button>
-                    <input placeholder="Find?" class="form-input" id="modal-form-input">
-                </form>
-                <a class="modal-close">x</a>
+    <!-- 搜索功能 -->
+    <div id="u-search">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="container">
+                    <form id="u-search-modal-form" class="u-search-modal-form">
+                        <button type="submit" class="form-submit-btn">
+                            <img src="../../../image/find.png" class="search-btn-img" />
+                        </button>
+                        <input placeholder="Find?" class="form-input" id="modal-form-input">
+                    </form>
+                    <a class="modal-close">x</a>
+                </div>
+                <div class="search-loading">
+                    <div class="search-loading-bar"></div>
+                </div>
             </div>
-            <div class="search-loading">
-                <div class="search-loading-bar"></div>
+            <div class="modal-body">
             </div>
         </div>
-        <div class="modal-body">
-        </div>
+        <div class="modal-overlay"></div>
     </div>
-    <div class="modal-overlay"></div>
-</div>
+</body>
 </html>

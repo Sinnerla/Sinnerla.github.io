@@ -5,6 +5,12 @@
   flex-wrap: nowrap;
   align-items: center;
 }
+.img-list,
+.img-column {
+  display: flex;
+  flex-direction: column-reverse;
+}
+.img-column a,
 .album-item {
   margin-top: 100px;
 }
