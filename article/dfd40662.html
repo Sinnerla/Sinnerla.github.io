@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="default">
+
+<head>
+    <!-- 网页头部 -->
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+
+    <link rel="icon" href="../favicon.ico">
+
+
+    <meta name="author" content="Sinnerla">
+
+
+    <meta name="subtitle" content="Whatever">
+
+
+    <meta name="description" content="blog of sinnerla">
+
+
+
+<title>黑暗骑士崛起 | S&#39;Blog</title>
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="../css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="../js/script.js"></script>
+    
+    <script src="../js/tocbot.min.js"></script>
+    
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    
+
+
+
+    <script>
+    function searchToggle() {
+        const width = $(document.body).width()
+        if(width > 479) {
+            return;
+        }
+        const search = $('.search');
+        const searchForm = $('.form-search');
+        const menuToggle = $('.menu-toggle');
+        const title = $('.navbar-header-title ');
+
+        if(!search.hasClass("mobile-search")) {
+            search.addClass("mobile-search");
+            menuToggle.addClass("open-search")
+            title.addClass("mobile-title-hidden")
+        } else {
+            search.removeClass("mobile-search");
+            menuToggle.removeClass("open-search")
+            // title.css({visibility: 'visible'})
+            title.removeClass("mobile-title-hidden")
+        }
+    }
+    function search(searchInputEl, formEl, flag) {
+        const path = "/" + "search.json"; // 可以在public 下查看这个search.json
+        $(formEl).submit(function(e){
+            e.preventDefault();
+            let target = null
+            if(searchInputEl == null) {
+                const screenWidth = $(document.body).width();
+                target = screenWidth > 479 ? $('#pc-search-input') : $('#mobile-search-input');
+                console.log(target);
+            } else {
+                target = $(searchInputEl)
+            }
+
+            if(!flag && target.val() === '') {
+                return ;
+            }
+
+            $("#u-search").fadeIn(500, function() {
+                $("body > .wrapper").addClass("modal-active");
+
+                $.ajax({
+                    url: path,
+                    dataType: "json",
+                    beforeSend: function (xhr) {
+                        $input = target.val();
+                        $(".form-input").val($input);
+                        const loadingBar = $('.search-loading-bar')
+                        loadingBar.css({
+                            width:'100%',
+                            display: 'block'
+                        });
+                    },
+                    success: function( datas ) {
+                        console.log(datas);
+                        const $resultPanel = $(".modal-body")[0];
+                        let str = `<ul class="modal-results">`;
+                        var keywords = $(".form-input").val().trim().toLowerCase().split(/[\s\-]+/);
+                        $resultPanel.innerHTML = "";
+                        let hasResult = false
+                        let text = `<div class="no-result">啊哦....</div>`;
+
+                        if ($(".form-input").val().trim().length <= 0) {
+                            // 没有结果
+                            $resultPanel.innerHTML = text;
+                            return;
+                        }
+                        datas.forEach(function (data, index) {
+                            var isMatch = true;
+                            if (!data.title || data.title.trim() === '') {
+                                data.title = "Untitled";
+                            }
+                            var data_title = data.title.trim().toLowerCase();
+                            var data_content = data.content && data.content.trim().replace(/<[^>]+>/g, "").toLowerCase() || '';
+                            var data_url = data.url;
+                            var index_title = -1;
+                            var index_content = -1;
+                            var first_occur = -1;
+                            // only match artiles with not empty contents
+                            if (data_content !== '') {
+                                keywords.forEach(function (keyword, i) {
+                                    index_title = data_title.indexOf(keyword);
+                                    index_content = data_content.indexOf(keyword);
+
+                                    if (index_title < 0 && index_content < 0) {
+                                        isMatch = false;
+                                    } else {
+                                        hasResult = true
+                                        if (index_content < 0) {
+                                            index_content = 0;
+                                        }
+                                        if (i == 0) {
+                                            first_occur = index_content;
+                                        }
+                                    }
+                                });
+                            } else {
+                                isMatch = false;
+                            }
+                            // show search results
+                            if (isMatch) {
+                                str += `<li class='result-item'><a href='${data_url}' class='result-item-detail'> <span class="title">${data_title}</span>`;
+                                var content = data.content.trim().replace(/<[^>]+>/g, "");
+                                if (first_occur >= 0) {
+                                    // cut out 200 characters
+                                    var start = first_occur - 40;
+                                    var end = first_occur + 160;
+
+                                    if (start < 0) {
+                                        start = 0;
+                                    }
+
+                                    if (start == 0) {
+                                        end = 200;
+                                    }
+
+                                    if (end > content.length) {
+                                        end = content.length;
+                                    }
+
+                                    var match_content = content.substring(start, end);
+
+                                    // highlight all keywords
+                                    keywords.forEach(function (keyword) {
+                                        var regS = new RegExp(keyword, "gi");
+                                        match_content = match_content.replace(regS, `<em class="search-keyword">${keyword}</em>`);
+                                    });
+
+                                    str += `<span class="content"> ${match_content} ...</span></a>`;
+                                }
+                                str += "</li>";
+                            }
+                        });
+                        str += "</ul>";
+                        if(hasResult) {
+                            $resultPanel.innerHTML = str;
+                        } else {
+                            $resultPanel.innerHTML = text;
+                        }
+
+                    },
+                    complete: function() {
+                        setTimeout(() => {
+                                const loadingBar = $('.search-loading-bar')
+                                loadingBar.css({
+                                    width:'0%',
+                                    display: 'none'
+                                });
+                        }, 300)
+                    }
+                });
+            })
+
+        });
+    }
+
+    $(document).ready(function() {
+        $('.modal-close').click(function () {
+            $("#u-search").fadeOut();
+            $("body > .wrapper").removeClass("modal-active")
+        })
+
+        $('.modal-overlay').click(function() {
+            $("#u-search").fadeOut();
+            $("body > .wrapper").removeClass("modal-active")
+        })
+        search(null, ".form-search", false)
+        search("#u-search-modal-form .form-input", ".u-search-modal-form", true)
+    })
+</script>
+
+
+
+<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="atom.xml" title="S'Blog" type="application/atom+xml">
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- 头部菜单 -->
+<header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">S&#39; Blog</a></div>
+            <div class="menu navbar-right">
+              <!-- 这里表示的是pc端搜索框 -->
+            
+            <!-- 搜索框 -->
+
+    <div class="search ">
+        <form class="form-search">
+            <input class="input" placeholder="Search！" autocomplete="off" id="pc-search-input"/>
+        </form>
+        <div class="search-btn" onClick="searchToggle()">
+            <img src="../image/search.png" class="search-btn-img" />
+        </div>
+    </div>
+
+
+            
+            <a class="menu-item" href="../archives">Posts</a>
+            
+            <a class="menu-item" href="../category">Categories</a>
+            
+            <a class="menu-item" href="../gallery">Gallery</a>
+            
+        </div>
+    </div>
+</nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">S&#39; Blog</a>
+                </div>
+                <!-- 这里表示的是移动端搜索框 -->
+                <div class="navbar-mobile-right">
+               <div class="menu-toggle" onclick="mobileBtn()">&#9776; 目录</div>
+               </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="../archives">Posts</a>
+                
+                    <a class="menu-item" href="../category">Categories</a>
+                
+                    <a class="menu-item" href="../gallery">Gallery</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+
+            <div class="main">
+                
+<!-- 文章正文（Post）页 -->
+<link rel="stylesheet" href="../fonts/iconfont/iconfont.css">
+<div class="container">
+
+
+  <!-- 文章正文侧边栏 -->
+<div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+</script>
+
+  
+
+<article class="post-wrap">
+  <header class="post-header">
+    <h1 class="post-title">黑暗骑士崛起</h1><br/>
+    
+      <div class="post-meta">
+        
+          Author &nbsp;&nbsp;&nbsp: &nbsp;&nbsp;&nbsp  <a itemprop="author" rel="author" href="/">Sinnerla</a>
+          <br/>
+          
+            <span class="post-time">
+              Date &nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp: &nbsp;&nbsp;&nbsp <a href="#">30 June, 2020</a>
+            </span>
+            <br/>
+            
+              <span class="post-category">
+                Category : &nbsp;&nbsp;&nbsp
+                
+                  <a href="../categories/%E6%80%9D%E8%80%8C%E5%90%8E%E6%84%9F/">思而后感</a>
+                  
+                </span>
+                
+              </div>
+              
+            </header>
+ <div class="post-content">
+   <blockquote>
+<h3 id="“疯狂就像是一种万有引力一样，你需要做的不过就是轻轻推一把“"><a href="#“疯狂就像是一种万有引力一样，你需要做的不过就是轻轻推一把“" class="headerlink" title="“疯狂就像是一种万有引力一样，你需要做的不过就是轻轻推一把“"></a>“疯狂就像是一种万有引力一样，你需要做的不过就是轻轻推一把“</h3></blockquote>
+<p>这是唯一一部让我看了一次又一次的超级英雄电影，影片的故事情节并不复杂，没有太多曲折，蝙蝠侠因为自身局限因为向往正常生活想要归隐，想借势造出一个新的正义勇士来对抗恶势力，但自己的白月光已经心属这位被选择了的正义勇士；而蝙蝠侠唯一的死对头——小丑，让他的打算完全化为泡影</p>
+<p>以上就是对剧情的高度概括，算不上反转，也没有太多曲折，但是这部影片基调沉重，细节繁多。支撑起整部影片的四个角色：蝙蝠侠，戈登，登特，小丑，代表着非法的正义，正义，失败的正义与完全的邪恶</p>
+<h2 id="蝙蝠侠"><a href="#蝙蝠侠" class="headerlink" title="蝙蝠侠"></a>蝙蝠侠</h2><p>影片的第二幕就是黑帮交易纠纷中蝙蝠侠模仿者出现，最后由蝙蝠侠亲自出马解决。暗示了蝙蝠侠的尴尬处境，罪犯们害怕他，有人模仿他，政府希望能够抓住他，代表正义的戈登有自己的想法想与蝙蝠侠联手打击罪犯，蝙蝠侠似乎是正义的一方但是他又不被所谓正义的一方承认。<br>蝙蝠侠第一次以韦恩的形象出现在大屏幕时，其实也和之前的场景呼应起来，作为人类，蝙蝠侠是有极限的，依然会被狗咬伤，出现大量的蝙蝠侠，这也不在他的预料之中</p>
+<blockquote>
+<p>“这根本不是我的初衷，虽然我是说过要启发人们。“</p>
+</blockquote>
+<p>在这部片子里，蝙蝠侠大部分时间都处在无法做选择的境地，管家阿福看着韦恩背上大量的伤口与淤青时说出：</p>
+<blockquote>
+<p>“快到你的极限了，韦恩少爷“</p>
+</blockquote>
+<p>韦恩回答道：</p>
+<blockquote>
+<p>”蝙蝠侠是没有极限的“</p>
+</blockquote>
+<p>这句话其实已经揭示出蝙蝠侠这个黑暗处的英雄的孤绝处</p>
+<p>芭蕾舞女演员讲：</p>
+<blockquote>
+<p>“这个城市把这样一个把蒙面义警给偶像化了”</p>
+</blockquote>
+<p>其实也在回答为什么会出现诸多模仿者，因为大家逐渐把蝙蝠侠当成正义伙伴，用蝙蝠侠来指代正义，但是蝙蝠侠真正想做的是让所有人都勇于反抗黑恶势力，然而他蒙面使用武器打击罪犯的举动本身却是非法的，这样，在法律所代表的正义的那一方，蝙蝠侠也属于和政府相对的黑恶势力，但是对于黑恶势力而言，蝙蝠侠是真正的敌人。 小丑多次说过蝙蝠侠和他的相似之处，其实是两者处境的相似，不论对于哪一方而言，他们都是freak（怪胎）。</p>
+<p><strong>他永远只能隐身于黑暗之中</strong></p>
+<p>这也呼应了影片名《黑暗骑士崛起》</p>
+<h2 id="戈登"><a href="#戈登" class="headerlink" title="戈登"></a>戈登</h2><p>片中四个主要角色中唯一一个从始至终都站在光明面的角色。<br>他和登特第一次会面就指出，登特是个理想主义者，而戈登在政府希望逮捕蝙蝠侠的同时又与蝙蝠侠保持联系和友好合作，从侧面说明尽管这个角色在四个主要角色中显得平庸无奇，但他其实代表了妥协之下的抗争，他好似心有余而力不足的庸人，但是在第一次逮捕小丑的行动中他表现出来的行为又异常勇谋。<br>这个角色，更像是蝙蝠侠故事的讲述者，在影片末尾起到的是勇士小说里吟游诗人的作用，因为蝙蝠侠的一切挣扎一切妥协，他都完全能够明白，但也同样的无能为力</p>
+<h2 id="登特"><a href="#登特" class="headerlink" title="登特"></a>登特</h2><p>第三个角色，哥谭市光明骑士，是一个配合黑暗骑士的抉择出现的角色，在英语原版中white 和dark 本就是相对的。<br>登特出场第一幕就展现出这个角色的聪明，进取，活力<br>登特和戈登影片中第一次见面是硬石头碰硬石头，谁也不让谁，登特非常聪明，直接推断出戈登与蝙蝠侠有合作，而且指出一个关键问题，戈登身边的人不能被全部相信，登特相信自己的判断，但同时戈登也表示没有这些人，自己做不了差事，最终是登特妥协了，但也导致了故事最后的走向。<br>曾经登特认为：</p>
+<blockquote>
+<p>“一个普通人站出来，为正义而战，高谭市正是以此而荣”</p>
+</blockquote>
+<p>芭蕾舞演员说：</p>
+<blockquote>
+<p>“高谭需要像你这样通过公开选举选出来的英雄，而不是一个认为自己能凌驾于法律之上的人”</p>
+</blockquote>
+<p>这句话其实启发了韦恩，或者说就是韦恩的想法<br>而登特敏锐地察觉到蝙蝠侠想要退隐的念头，也表示了自己愿意继承蝙蝠侠意志的意向<br>对于蝙蝠侠来说，此时，瑞秋代表着他的正常生活，而登特是他回归正常生活的途径，不管瑞秋是不是愿意再和他在一起，但是他有了回归正常生活的机会<br>在餐桌上瑞秋提醒登特，罗马民主选举出的英雄最后成为了独裁者，登特的回答完全是对他这一生的高度概括：</p>
+<blockquote>
+<p>“要么你就像一个英雄一样死去，要么苟活，眼睁睁看着自己变成恶棍”</p>
+</blockquote>
+<p>这个角色的堕落也是可以预见的，他的身上没有太多压抑，更多的是愤怒，而愤怒的人更容易被煽动。<br>登特在最后与蝙蝠侠的对峙中质问，为什么三个人做出的决定，只有他失去了一切.但其实，蝙蝠侠也失去了回归正常生活的任何希望，他将永远在黑暗中潜伏<br>而登特被烧掉一半脸同时也暗示着邪恶一面被激发，他成了彻彻底底的双面人，配合着后来他嘴里一再强调的50%与50%的绝对公平</p>
+<h2 id="小丑"><a href="#小丑" class="headerlink" title="小丑"></a>小丑</h2><p>可谓是这部电影里最浓墨重彩的角色。<br>这部影片的开始，就是小丑和其帮手们抢劫黑帮银行，整场行动表现了小丑这个人物的聪明，谋略，狠辣和不讲道理。<br>小丑的第二次出场就是大剌剌地独身走进黑帮大佬的密谈会，用笔杀了一个人，这里的动作太流畅了，每次看都觉得真的太流畅了。在这里小丑对黑帮成员讲自己的目的是：“杀了蝙蝠侠”，然后拿黑帮一半的钱，这里被两次嘲笑，有人说：“你疯了。”小丑回答了两次：“不，我没有” 略低头抬眼看人，配合他的妆容，像是掠食者在观察猎物。</p>
+<p>小丑在和蝙蝠侠对峙时就说过：</p>
+<blockquote>
+<p>“我并不想杀你，没有你让我怎么活？你的存在让我觉得人生完整“</p>
+</blockquote>
+<p>蝙蝠侠说：</p>
+<blockquote>
+<p>”你是为了钱不惜滥杀无辜的垃圾“</p>
+</blockquote>
+<p>小丑的回答是：</p>
+<blockquote>
+<p>”别像他们那样肤浅，你不是他们，即使你想变成他们中的一员，对他们来说，你只是一个怪物，和我没有两样“</p>
+</blockquote>
+<p>但小丑的真实目的，借阿福之口已经说得非常明白了：</p>
+<blockquote>
+<p>“Some men just wanna watch the world burn“</p>
+</blockquote>
+<p>在其后的独白里，小丑讲述的其实就是他的目的，他不是为了钱，也不是为了其他罪犯信仰的东西，他只是在满足自己，他要做一个实验，他要和蝙蝠侠做一个游戏，而不是完成什么目的：</p>
+<blockquote>
+<p>“他们需要你时就让你来，等他们用完你了，他们就把你当成麻风病人，你也看见了他们所谓的道德口号，只不过是一些陈词滥调而已，一旦面临麻烦，他们都会回归本性，我会展示给你看，当整个世界陷入混乱，这些，这些文明人士，他们就会互相残杀，瞧，我可不是怪物，我只不过是局势引领者。“</p>
+</blockquote>
+<p><strong>要想生存最好的方式是没有原则</strong></p>
+<p>小丑的可怕之处也是如此，蝙蝠侠找到黑帮头子之一逼问小丑下落得到的答案是：</p>
+<blockquote>
+<p>“你有原则，小丑是没有原则的，没有人会为了你出卖小丑“</p>
+</blockquote>
+<p>而这位黑帮头子在影片最初还嘲讽过小丑。</p>
+<p>在小丑的人性实验失败之后，小丑其实是有些意外的，但他永远留有一手，在这部影片里，他看似一次又一次地失败，但每次失败都在为下一步做准备，直到毁掉哥谭市的光明骑士，蝙蝠侠的继承者。</p>
+<p>关于小丑脸上的疤，在电影中小丑有两个不同的解释，一个是他爸爸醉酒后一边问</p>
+<blockquote>
+<p>“why so serious so？”</p>
+</blockquote>
+<p>“let‘s put a smile on that face”一边划开的，另一个是为了讨毁容的妻子的开心自己划开的。</p>
+<p>我倾向于都不是真的，小丑这个角色不能用常规逻辑去理解，他的身上有表演型人格的特质，当他两次对同一个问题进行回答，甚至最后还问过蝙蝠侠想不想知道这些疤是怎么来的，那么这些疤对于小丑而言一定是有某种意义在其中的，但表面上的答案它可以有不同的表现形式。<br>第一次他解释自己的疤是对着甘宝，如果观众记忆力还不错应该还记得小丑说过：</p>
+<blockquote>
+<p>“那这位小甘宝就拿不到一毛钱给他的奶奶了“</p>
+</blockquote>
+<p>而此时，对于小丑而言，这个答案是在破坏亲情的温馨氛围，第二次是对着瑞秋解释，瑞秋此时以登特的女朋友身份登场，这个答案其实也在破坏爱情的氛围。<br>影片中没有交代小丑的第三个答案，但我猜想，这个答案会根据蝙蝠侠英雄形象进行更改，最后他要破坏掉蝙蝠侠作为正义伙伴的氛围。</p>
+<h2 id="瑞秋"><a href="#瑞秋" class="headerlink" title="瑞秋"></a>瑞秋</h2><p>一个很重要但是戏份不多的角色，她更多是一种指代意义，就像借角色之口说的，她是蝙蝠侠平凡生活的希望。当瑞秋和登特同时陷入危险，蝙蝠侠毫不犹豫地去救瑞秋，因为瑞秋本身是一种希望，比登特背后所代表的，达到希望的途径也好机会也罢要重要得多，因为没有了希望本身，那么到达希望的路径也毫无用处</p>
+<p>影片镜头的运用也可谓流畅自如，抢银行时的各种转场与各种巧妙的接镜头，更不用说在最后小丑由倒立转为正立的那个镜头的隐喻效果<br>还有一个拍案叫绝的镜头处理，关于蝙蝠侠搭私人飞机去往中国同时需要制造不在场证明，他选择用和芭蕾舞演员一起乘坐游艇出游作为幌子，但是电影中没有直接描述他怎么去做这件事，而是让登特和瑞秋去往剧场观看芭蕾舞表演时发现演出取消，再接着镜头给到一帮贴着的报纸上，由报纸上的游艇再转到真实的游艇</p>
+<p>同时影片中有几个关键问题，小丑实施银行抢劫的时候倒地的大堂经理问他：</p>
+<blockquote>
+<p>“What do you believe in？”<br>这个城市的罪犯向来都是有自己的信仰的，名声，敬意，但是你信仰什么？</p>
+</blockquote>
+<p>当时小丑没有正面回答，因为他不屑于回答这个问题：</p>
+<blockquote>
+<p>“我相信这个东西即使炸不死你，也会让你更加，怪异”</p>
+</blockquote>
+<p>整部影片可谓都在表现小丑在做什么，但是小丑自己也不知道自己想做什么，他形容自己是个追公车的疯狗，追上了其实他也不知道自己该干什么了。影片中好几次他给蝙蝠侠打死自己的机会，但是每次蝙蝠侠都让他失望却是意料之中地放过了他的性命。</p>
+<p>蝙蝠侠第一次出场，大量假冒伪劣的蝙蝠侠战力不高却勇于冲锋，人人都是蝙蝠侠，好似一场狂欢。真正的蝙蝠侠出场解决了大部分问题后告诉这群热心群众：“别再让我看到你们。我不需要帮助。”其中一个意味深长地说：“我可不这样认为“，还有一个愤愤地问：<br>“你哪儿来这样的权力？你和我们有什么区别？”<br>第一个问题蝙蝠侠回答不了，因为本质上他和他们没有什么区别，他也没有权力警告他人不要去打击罪犯，而且第一次问题其实贯穿整部电影，每一个人都直接或间接地在问蝙蝠侠：“你哪儿来这样的权利”；但第二个问题，他看似不经意的一句讽刺，其实回答了他和他们的不同。“我不穿曲棍球护胸“，装备与自身身体素质的差异决定了他成为蝙蝠侠可以打击罪犯，而他们成为蝙蝠侠只能被罪犯打击，。</p>
+<p>蝙蝠侠没有权利，所以他不能是英雄，他是永远在黑夜中打击罪恶，同时被警察所代表的正义追捕，所以这是，黑暗骑士崛起的原因</p>
+
+ </div>
+   <section class="post-tags">
+     <div>
+       <span class="tag">
+         
+           
+             <a href="../tags/film/"><i class="iconfont icon-tag"></i>&nbsp;&nbsp;film&nbsp;&nbsp;</a>
+           
+         
+       </span>
+     </div>
+     <div>
+       <a href="javascript:window.history.back();">back</a>
+       <span>· </span>
+       <a href="/">home</a>
+     </div>
+   </section>
+   <section class="post-nav">
+     
+       <a class="prev" rel="prev" href="3ad9129c.html">红舞鞋</a>
+       
+     
+       <a class="next" rel="next" href="feada8df.html">一个十八岁的男孩决定去死</a>
+       
+    </section>
+    
+      <section class="post-copyright">
+        
+          <div class="copyright-item">
+            <span>Sinnerla</span>
+          </div>
+          
+        
+        
+        
+          <span>辛拉没有麺，真的没有</span>
+          
+        </section>
+        
+</article>
+
+</div>
+
+
+ <div id="gitalk-container"></div>
+ <!-- Gitalk支持 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+ var gitalk = new Gitalk({
+ clientID: '1ef6686ae0caacdc40c6',
+ clientSecret: '4ba0ba87d81338047baa13bc94f52adac3555323',
+ repo: 'Gitalk_Date',
+ owner: 'Sinnerla',
+ admin: 'Sinnerla',
+ id: location.pathname,
+ labels: 'Gitalk'.split(',').filter(l => l),
+ perPage: 10,
+ pagerDirection: 'last',
+ createIssueManually: true,
+ distractionFreeMode: true
+ })
+ gitalk.render('gitalk-container')
+</script>
+
+
+
+            </div>
+            <!--页脚-->
+<link rel="stylesheet" href="../fonts/iconfont/iconfont.css">
+<footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 美丽的Sinnerla | Powered by
+          <a href="https://hexo.io" target="_blank">Hexo</a> &
+          <a href="https://github.com/Sinnerla/Sinnerla.github.io" target="_blank"><i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> S'blog <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i></a>
+        </span>
+    </div>
+</footer>
+
+    </div>
+    <!-- 搜索功能 -->
+    <div id="u-search">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="container">
+                    <form id="u-search-modal-form" class="u-search-modal-form">
+                        <button type="submit" class="form-submit-btn">
+                            <img src="../image/find.png" class="search-btn-img" />
+                        </button>
+                        <input placeholder="Find?" class="form-input" id="modal-form-input">
+                    </form>
+                    <a class="modal-close">x</a>
+                </div>
+                <div class="search-loading">
+                    <div class="search-loading-bar"></div>
+                </div>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+        <div class="modal-overlay"></div>
+    </div>
+</body>
+</html>

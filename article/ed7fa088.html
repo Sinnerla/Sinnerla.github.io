@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="default">
+
+<head>
+    <!-- 网页头部 -->
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+
+    <link rel="icon" href="../favicon.ico">
+
+
+    <meta name="author" content="Sinnerla">
+
+
+    <meta name="subtitle" content="Whatever">
+
+
+    <meta name="description" content="blog of sinnerla">
+
+
+
+<title>存在与虚无 | S&#39;Blog</title>
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="../css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="../js/script.js"></script>
+    
+    <script src="../js/tocbot.min.js"></script>
+    
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    
+
+
+
+    <script>
+    function searchToggle() {
+        const width = $(document.body).width()
+        if(width > 479) {
+            return;
+        }
+        const search = $('.search');
+        const searchForm = $('.form-search');
+        const menuToggle = $('.menu-toggle');
+        const title = $('.navbar-header-title ');
+
+        if(!search.hasClass("mobile-search")) {
+            search.addClass("mobile-search");
+            menuToggle.addClass("open-search")
+            title.addClass("mobile-title-hidden")
+        } else {
+            search.removeClass("mobile-search");
+            menuToggle.removeClass("open-search")
+            // title.css({visibility: 'visible'})
+            title.removeClass("mobile-title-hidden")
+        }
+    }
+    function search(searchInputEl, formEl, flag) {
+        const path = "/" + "search.json"; // 可以在public 下查看这个search.json
+        $(formEl).submit(function(e){
+            e.preventDefault();
+            let target = null
+            if(searchInputEl == null) {
+                const screenWidth = $(document.body).width();
+                target = screenWidth > 479 ? $('#pc-search-input') : $('#mobile-search-input');
+                console.log(target);
+            } else {
+                target = $(searchInputEl)
+            }
+
+            if(!flag && target.val() === '') {
+                return ;
+            }
+
+            $("#u-search").fadeIn(500, function() {
+                $("body > .wrapper").addClass("modal-active");
+
+                $.ajax({
+                    url: path,
+                    dataType: "json",
+                    beforeSend: function (xhr) {
+                        $input = target.val();
+                        $(".form-input").val($input);
+                        const loadingBar = $('.search-loading-bar')
+                        loadingBar.css({
+                            width:'100%',
+                            display: 'block'
+                        });
+                    },
+                    success: function( datas ) {
+                        console.log(datas);
+                        const $resultPanel = $(".modal-body")[0];
+                        let str = `<ul class="modal-results">`;
+                        var keywords = $(".form-input").val().trim().toLowerCase().split(/[\s\-]+/);
+                        $resultPanel.innerHTML = "";
+                        let hasResult = false
+                        let text = `<div class="no-result">啊哦....</div>`;
+
+                        if ($(".form-input").val().trim().length <= 0) {
+                            // 没有结果
+                            $resultPanel.innerHTML = text;
+                            return;
+                        }
+                        datas.forEach(function (data, index) {
+                            var isMatch = true;
+                            if (!data.title || data.title.trim() === '') {
+                                data.title = "Untitled";
+                            }
+                            var data_title = data.title.trim().toLowerCase();
+                            var data_content = data.content && data.content.trim().replace(/<[^>]+>/g, "").toLowerCase() || '';
+                            var data_url = data.url;
+                            var index_title = -1;
+                            var index_content = -1;
+                            var first_occur = -1;
+                            // only match artiles with not empty contents
+                            if (data_content !== '') {
+                                keywords.forEach(function (keyword, i) {
+                                    index_title = data_title.indexOf(keyword);
+                                    index_content = data_content.indexOf(keyword);
+
+                                    if (index_title < 0 && index_content < 0) {
+                                        isMatch = false;
+                                    } else {
+                                        hasResult = true
+                                        if (index_content < 0) {
+                                            index_content = 0;
+                                        }
+                                        if (i == 0) {
+                                            first_occur = index_content;
+                                        }
+                                    }
+                                });
+                            } else {
+                                isMatch = false;
+                            }
+                            // show search results
+                            if (isMatch) {
+                                str += `<li class='result-item'><a href='${data_url}' class='result-item-detail'> <span class="title">${data_title}</span>`;
+                                var content = data.content.trim().replace(/<[^>]+>/g, "");
+                                if (first_occur >= 0) {
+                                    // cut out 200 characters
+                                    var start = first_occur - 40;
+                                    var end = first_occur + 160;
+
+                                    if (start < 0) {
+                                        start = 0;
+                                    }
+
+                                    if (start == 0) {
+                                        end = 200;
+                                    }
+
+                                    if (end > content.length) {
+                                        end = content.length;
+                                    }
+
+                                    var match_content = content.substring(start, end);
+
+                                    // highlight all keywords
+                                    keywords.forEach(function (keyword) {
+                                        var regS = new RegExp(keyword, "gi");
+                                        match_content = match_content.replace(regS, `<em class="search-keyword">${keyword}</em>`);
+                                    });
+
+                                    str += `<span class="content"> ${match_content} ...</span></a>`;
+                                }
+                                str += "</li>";
+                            }
+                        });
+                        str += "</ul>";
+                        if(hasResult) {
+                            $resultPanel.innerHTML = str;
+                        } else {
+                            $resultPanel.innerHTML = text;
+                        }
+
+                    },
+                    complete: function() {
+                        setTimeout(() => {
+                                const loadingBar = $('.search-loading-bar')
+                                loadingBar.css({
+                                    width:'0%',
+                                    display: 'none'
+                                });
+                        }, 300)
+                    }
+                });
+            })
+
+        });
+    }
+
+    $(document).ready(function() {
+        $('.modal-close').click(function () {
+            $("#u-search").fadeOut();
+            $("body > .wrapper").removeClass("modal-active")
+        })
+
+        $('.modal-overlay').click(function() {
+            $("#u-search").fadeOut();
+            $("body > .wrapper").removeClass("modal-active")
+        })
+        search(null, ".form-search", false)
+        search("#u-search-modal-form .form-input", ".u-search-modal-form", true)
+    })
+</script>
+
+
+
+<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="atom.xml" title="S'Blog" type="application/atom+xml">
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- 头部菜单 -->
+<header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">S&#39; Blog</a></div>
+            <div class="menu navbar-right">
+              <!-- 这里表示的是pc端搜索框 -->
+            
+            <!-- 搜索框 -->
+
+    <div class="search ">
+        <form class="form-search">
+            <input class="input" placeholder="Search！" autocomplete="off" id="pc-search-input"/>
+        </form>
+        <div class="search-btn" onClick="searchToggle()">
+            <img src="../image/search.png" class="search-btn-img" />
+        </div>
+    </div>
+
+
+            
+            <a class="menu-item" href="../archives">Posts</a>
+            
+            <a class="menu-item" href="../category">Categories</a>
+            
+            <a class="menu-item" href="../gallery">Gallery</a>
+            
+        </div>
+    </div>
+</nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">S&#39; Blog</a>
+                </div>
+                <!-- 这里表示的是移动端搜索框 -->
+                <div class="navbar-mobile-right">
+               <div class="menu-toggle" onclick="mobileBtn()">&#9776; 目录</div>
+               </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="../archives">Posts</a>
+                
+                    <a class="menu-item" href="../category">Categories</a>
+                
+                    <a class="menu-item" href="../gallery">Gallery</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+
+            <div class="main">
+                
+<!-- 文章正文（Post）页 -->
+<link rel="stylesheet" href="../fonts/iconfont/iconfont.css">
+<div class="container">
+
+
+
+<article class="post-wrap">
+  <header class="post-header">
+    <h1 class="post-title">存在与虚无</h1><br/>
+    
+      <div class="post-meta">
+        
+          Author &nbsp;&nbsp;&nbsp: &nbsp;&nbsp;&nbsp  <a itemprop="author" rel="author" href="/">Sinnerla</a>
+          <br/>
+          
+            <span class="post-time">
+              Date &nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp: &nbsp;&nbsp;&nbsp <a href="#">12 October, 2018</a>
+            </span>
+            <br/>
+            
+              <span class="post-category">
+                Category : &nbsp;&nbsp;&nbsp
+                
+                  <a href="../categories/%E6%80%9D%E8%80%8C%E5%90%8E%E6%84%9F/">思而后感</a>
+                  
+                </span>
+                
+              </div>
+              
+            </header>
+ <div class="post-content">
+   <p>来了来了，又是那种作呕的感觉，想吐，可实际上如果真的催吐我也只能吐点儿酸水，为什么我不能正常一点，就像大家一样认真对待自己的生活？因为我说服不了自己“看见”生活的意义，是我把自己困在一个盒子里，结果我还在这里无病呻吟，显得特别滑稽</p>
+<p>我不想一遍一遍去和别人解释我为什么不开心<br>但是不和他们讲，他们永远没法理解我为什么不开心</p>
+<p>存在主义难道不是对人类身处于这个世界上的欲望和虚无主义之间产生的心理矛盾做出的退让？<br>如果一个虚无主义者，既要承认无意义又要追求感官的享乐，不论如何弱化心理感受，一定会感到有种无解的矛盾，但是存在主义给出了合理的解释，像是存在主义对虚无主义进行了亲人化的包装，使虚无主义更适用于真实情况，虚无主义不就像修仙文中的道，如何才能得道，得道后，还存在自我吗？如果不存在了，那么得道对于当初修行的个体不就又是无意义罢了？存在主义就是赋予修行这一过程以意义，但是存在主义赋予意义这种过程还是行为？本身就是无意义，就像是道法自然和大道归一，虚无主义不是绝对真理</p>
+<p>今天和一个朋友不知不觉谈到了自身比较核心的部分，关于自我认知的人生的意义，起因是讨论要不要生孩子。她说她一定会找个爱她的男人然后生一个孩子，因为孩子是她血统的延续，某种程度上，是她人生意义的延展，不管对整个人类历史进程起到的的作用和意义有多小，那也就是有意义。<br>我感受到她强烈的理想主义，对自身的一些行为有着一种崇高的使命感并且愿意为此付出。其实我，怎么说呢，是有点羡慕这种感觉，因为我感觉我没有这种内在的力量去指引我，我的内部是极其原始的一片混沌，我甚至比不上幼儿园的小朋友，ta们内心有一种向上的力量，去引导ta们如何更好地和这个世界相处并且从这种相处中提取力量，而我感受不到这种力量，或者我曾经可以但是现在已经不会了，因为我否认了“向上”的意义。<br>也许是囿于见识浅薄，但是我做不到赋予人生什么意义更别说延展，又或者是我自己给自己设下了心灵圈套，让我走不出无意义的圆圈，看不到圆圈之外的世界，我时常这么想，如果，如果我能够坚持接受一段长时间高质量的心理治疗，我是不是能够重新感受到把许多人连在一起的那种东西，改变后的我还是不是我，对于现在一团糟的我来说，改变后的我还有没有意义，但是我又会习惯性地认为自己被意义这个伪概念框住了，我总觉得意义要基于行为或者事件才能存在，没有任何依托的意义是不存在的。人活着不是为了创造意义，意义应该是，自然而然的产物，它也许已经产生了，但是我看不到它<br>我又想起另一个朋友说的话，她说，她受不了混乱地生活，如果有事情搅成一团乱麻她会很难受，她要详细地制定计划，每天睡前要将明天要做的事想一遍，列出轻重缓急然后才能睡得着，她希望把一切可能会影响到涉及到她的事件或任务的一切影响因子抓在手里，好使最后的结果符合她的心理预期。很好笑的是，初中时期我一度觉得我和她很相似，大概相似在了神经质维度上。她对自己的强迫症有点不满，问我怎样能够像我一样这么随性生活。我当然劝其不要尝试像我一样生活，因为按照她的性格她会疯掉。她非常优秀，从小学就是如此，她朝着每个阶段的目标迈进，自律对于她来说就像呼吸一样必要并且丝毫不费力气，她的目光永远看着更高的地方。她说她经常思考怎么样做什么事可以对人类，或者往小一点说，对祖国有所贡献，让人民的生活变得更好，她认为人生就是要做一点有意义的事情，这就是她定义的意义。<br>所以意义很像吃糖时感受到的的甜味，行为是吃糖（因为我喜欢吃糖），人是产生意义的载体，当我看见别人吃糖时，我会下意识觉得ta一定觉得甜，ta现在挺快乐，但实际上ta不一定觉得快乐，意义肯定不是真理家族的一份子，主观性太强烈，换一个人，又是不同的意义。<br>所以意义，就像意识层面的一种看法，无论是个人，还是集体，一个意识体赋予一个事物一个行为一种看法，我tm又绕回来了，所以我还是不觉得人生有什么意义，因为我对很多事件没有看法，我是个不生产任何有价值的东西的空盒子，我只是在不停地接受信息，这些信息在我的脑子里随意地游荡，成为一坨浆糊，我否认了一些东西意义的同时，这些东西也在否认我，力的作用是相互的，这很合理。但是人生存本能产生的欲望拉住我，让我想办法正常地活下去，于是慢慢地我从虚无主义向存在主义妥协，因为我还是在追求本能，我还在享受感官带来的各种刺激，如果我对存在的当下赋予了意义那么我就能开开心心地活着，我的大脑对我非常友好。</p>
+<p>实际上我因为各种各样的原因已经内耗很久了，所以我给不出比较客观比较好的答案，现在在强制自己早睡早起三餐吃饱，我想看看，是不是因为这几年作息混乱导致激素失调才有这后面许多事情</p>
+<p>我本质上应该就是一个虚无主义者，对事物的否认是根源上的，只不过，人活着无法否认自我感受的存在，所以为了让自己的想法符合基本逻辑，生活中我实际践行的是存在主义，也就是，我承认生活着产生的各种情绪各种感受是所谓有意义的，但这种承认更像是一种心理话术<br>我对很多主义都很认可，但是最内核的那一层一定是虚无主义和存在主义的互相抗衡，因为涉及到我从小到大苦恼的根源，就是我本身的这个存在，我活着所以产生各种情绪，如果我不是活着的状态就不用经历这些东西，西西弗神话里有一句话当时对我来说就是，看到的时候咯噔一下：真正严肃的哲学问题只有自杀，判断人生值不值得活等于回答哲学的根本问题。我觉得就好像分了两个方向，一个方向是承认了生活意义的哲学，一个方向就是无意义，走向无意义的人就是这整个世界的局外人，在局外人的小说里，主角也是在最后即将离开世界的时候才跃升为存在主义，感觉就像顿悟一样，他突然理解了什么，然后又能感受到意义了，美剧真探第一集里的主角也是这样，濒死状态体验到生命的存续和爱，最后跃升为存在主义，这是从他们自身的感受出发有的过程。但实际上每一个走向虚无却还是继续活着的人都是存在主义的实践者，他们在做一件他们已经否定了意义的事情</p>
+<p>不过目前我怀疑我的无意义感的真正来源是自身的低价值感，也就是否认我自己的这部分，让我觉得很困惑，因为我想不起来到底从时候时候开始有了这种想法，就好像我从能明白生活是可以被结束的那一天起我就想逃避生活本身，为什么要逃避肯定会有个理由，比虚无主义更接近生活本身的理由</p>
+<p>我有想过，如果最后这个问题还没等我想出答案也没有顿悟的时刻我就已经受不了了，我会尝试走一条灵性的道路，强行赋予意义，但是，从经验判断，最后我会自己破坏掉好不容易被赋予的意义。B站有个up叫小野寺的，他之前直播讲关于他和他女朋友的两件事，他们异国恋，女朋友觉得很辛苦，给他发语音说，自己很累，本意是想要求安抚，但是他就发了一串 一给我哩giaogiao 过去，还有一次是他女朋友专程去看他，酒店订好了，俩人在床上，气氛正好的时候，他又突然开始giao言giao语，当时他说完，直播间全是？？？？但是我完全能够理解那种行为，甚至我一直不自觉在干同样的事情，只是我相对克制，就像是，有一种破坏气氛的倾向，不管是温情时刻，还是需要全体肃立的场合，就这个问题我还问过咨询师，到底我什么毛病，她说从我以往的叙述中感觉到我很多时候在反向形成，但是后来我自己查资料，感觉也不是一回事</p>
+<p>我对所有可能保持怀疑但是同时我又接受所有可能性，我也不是特别纠结于意义本身，只是如果要谈到意义我会无限倾向于无意义。所有的迷惑也许会有一个终点，我希望终点是自己的死，因为我其实害怕死后意识还会继续存在（这恰恰证明了我相信死后意识会继续存在，笑死）我有好几年特别热衷于神秘学，涉及到扬升的内容让我尤其不安，如果所有的生命最后会回归统一，“我”这个意识就不会继续存在了，这种不安更像是，本能产生的感受。因为我本身已经否定了自我意识的意义，所以如果我在保持这一世的意识下发现生命终将归一，我大概会觉得是个很不错的结局，并且欣然接受，包括轮回说，如果记忆会被消除，每一世我都是一个新的东西，我也会觉得ok，之前的讨论是仅限我们所知的世界，我希望我从未出现，如果展开我们不可知的世界，做不到我从未出现，那就消解这一世的我，这一世的我和本来的我不是一种东西<br>这一世直到现在我觉得生命的终极幸福是从未出现过，也许再往后几十年我会改变看法，也许死后真正的我会觉得这一世我没有找到真正重要的东西，但是人就是这样，尽管可以不停地眺望星空，但是脚底，屁股和背都会一遍一遍提醒自己在这里，当下的感受，算是我唯一承认的意义，因为它无法否认</p>
+
+ </div>
+   <section class="post-tags">
+     <div>
+       <span class="tag">
+         
+           
+             <a href="../tags/think/"><i class="iconfont icon-tag"></i>&nbsp;&nbsp;think&nbsp;&nbsp;</a>
+           
+         
+       </span>
+     </div>
+     <div>
+       <a href="javascript:window.history.back();">back</a>
+       <span>· </span>
+       <a href="/">home</a>
+     </div>
+   </section>
+   <section class="post-nav">
+     
+       <a class="prev" rel="prev" href="692b5425.html">Women in the Old Testament</a>
+       
+     
+       <a class="next" rel="next" href="cfc657db.html">目录</a>
+       
+    </section>
+    
+      <section class="post-copyright">
+        
+          <div class="copyright-item">
+            <span>Sinnerla</span>
+          </div>
+          
+        
+        
+        
+          <span>辛拉没有麺，真的没有</span>
+          
+        </section>
+        
+</article>
+
+</div>
+
+
+ <div id="gitalk-container"></div>
+ <!-- Gitalk支持 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+ var gitalk = new Gitalk({
+ clientID: '1ef6686ae0caacdc40c6',
+ clientSecret: '4ba0ba87d81338047baa13bc94f52adac3555323',
+ repo: 'Gitalk_Date',
+ owner: 'Sinnerla',
+ admin: 'Sinnerla',
+ id: location.pathname,
+ labels: 'Gitalk'.split(',').filter(l => l),
+ perPage: 10,
+ pagerDirection: 'last',
+ createIssueManually: true,
+ distractionFreeMode: true
+ })
+ gitalk.render('gitalk-container')
+</script>
+
+
+
+            </div>
+            <!--页脚-->
+<link rel="stylesheet" href="../fonts/iconfont/iconfont.css">
+<footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 美丽的Sinnerla | Powered by
+          <a href="https://hexo.io" target="_blank">Hexo</a> &
+          <a href="https://github.com/Sinnerla/Sinnerla.github.io" target="_blank"><i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> S'blog <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i></a>
+        </span>
+    </div>
+</footer>
+
+    </div>
+    <!-- 搜索功能 -->
+    <div id="u-search">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="container">
+                    <form id="u-search-modal-form" class="u-search-modal-form">
+                        <button type="submit" class="form-submit-btn">
+                            <img src="../image/find.png" class="search-btn-img" />
+                        </button>
+                        <input placeholder="Find?" class="form-input" id="modal-form-input">
+                    </form>
+                    <a class="modal-close">x</a>
+                </div>
+                <div class="search-loading">
+                    <div class="search-loading-bar"></div>
+                </div>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+        <div class="modal-overlay"></div>
+    </div>
+</body>
+</html>

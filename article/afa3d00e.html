@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="default">
+
+<head>
+    <!-- 网页头部 -->
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+
+    <link rel="icon" href="../favicon.ico">
+
+
+    <meta name="author" content="Sinnerla">
+
+
+    <meta name="subtitle" content="Whatever">
+
+
+    <meta name="description" content="blog of sinnerla">
+
+
+
+<title>跳水世界杯志愿活动 | S&#39;Blog</title>
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="../css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="../js/script.js"></script>
+    
+    <script src="../js/tocbot.min.js"></script>
+    
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    
+
+
+
+    <script>
+    function searchToggle() {
+        const width = $(document.body).width()
+        if(width > 479) {
+            return;
+        }
+        const search = $('.search');
+        const searchForm = $('.form-search');
+        const menuToggle = $('.menu-toggle');
+        const title = $('.navbar-header-title ');
+
+        if(!search.hasClass("mobile-search")) {
+            search.addClass("mobile-search");
+            menuToggle.addClass("open-search")
+            title.addClass("mobile-title-hidden")
+        } else {
+            search.removeClass("mobile-search");
+            menuToggle.removeClass("open-search")
+            // title.css({visibility: 'visible'})
+            title.removeClass("mobile-title-hidden")
+        }
+    }
+    function search(searchInputEl, formEl, flag) {
+        const path = "/" + "search.json"; // 可以在public 下查看这个search.json
+        $(formEl).submit(function(e){
+            e.preventDefault();
+            let target = null
+            if(searchInputEl == null) {
+                const screenWidth = $(document.body).width();
+                target = screenWidth > 479 ? $('#pc-search-input') : $('#mobile-search-input');
+                console.log(target);
+            } else {
+                target = $(searchInputEl)
+            }
+
+            if(!flag && target.val() === '') {
+                return ;
+            }
+
+            $("#u-search").fadeIn(500, function() {
+                $("body > .wrapper").addClass("modal-active");
+
+                $.ajax({
+                    url: path,
+                    dataType: "json",
+                    beforeSend: function (xhr) {
+                        $input = target.val();
+                        $(".form-input").val($input);
+                        const loadingBar = $('.search-loading-bar')
+                        loadingBar.css({
+                            width:'100%',
+                            display: 'block'
+                        });
+                    },
+                    success: function( datas ) {
+                        console.log(datas);
+                        const $resultPanel = $(".modal-body")[0];
+                        let str = `<ul class="modal-results">`;
+                        var keywords = $(".form-input").val().trim().toLowerCase().split(/[\s\-]+/);
+                        $resultPanel.innerHTML = "";
+                        let hasResult = false
+                        let text = `<div class="no-result">啊哦....</div>`;
+
+                        if ($(".form-input").val().trim().length <= 0) {
+                            // 没有结果
+                            $resultPanel.innerHTML = text;
+                            return;
+                        }
+                        datas.forEach(function (data, index) {
+                            var isMatch = true;
+                            if (!data.title || data.title.trim() === '') {
+                                data.title = "Untitled";
+                            }
+                            var data_title = data.title.trim().toLowerCase();
+                            var data_content = data.content && data.content.trim().replace(/<[^>]+>/g, "").toLowerCase() || '';
+                            var data_url = data.url;
+                            var index_title = -1;
+                            var index_content = -1;
+                            var first_occur = -1;
+                            // only match artiles with not empty contents
+                            if (data_content !== '') {
+                                keywords.forEach(function (keyword, i) {
+                                    index_title = data_title.indexOf(keyword);
+                                    index_content = data_content.indexOf(keyword);
+
+                                    if (index_title < 0 && index_content < 0) {
+                                        isMatch = false;
+                                    } else {
+                                        hasResult = true
+                                        if (index_content < 0) {
+                                            index_content = 0;
+                                        }
+                                        if (i == 0) {
+                                            first_occur = index_content;
+                                        }
+                                    }
+                                });
+                            } else {
+                                isMatch = false;
+                            }
+                            // show search results
+                            if (isMatch) {
+                                str += `<li class='result-item'><a href='${data_url}' class='result-item-detail'> <span class="title">${data_title}</span>`;
+                                var content = data.content.trim().replace(/<[^>]+>/g, "");
+                                if (first_occur >= 0) {
+                                    // cut out 200 characters
+                                    var start = first_occur - 40;
+                                    var end = first_occur + 160;
+
+                                    if (start < 0) {
+                                        start = 0;
+                                    }
+
+                                    if (start == 0) {
+                                        end = 200;
+                                    }
+
+                                    if (end > content.length) {
+                                        end = content.length;
+                                    }
+
+                                    var match_content = content.substring(start, end);
+
+                                    // highlight all keywords
+                                    keywords.forEach(function (keyword) {
+                                        var regS = new RegExp(keyword, "gi");
+                                        match_content = match_content.replace(regS, `<em class="search-keyword">${keyword}</em>`);
+                                    });
+
+                                    str += `<span class="content"> ${match_content} ...</span></a>`;
+                                }
+                                str += "</li>";
+                            }
+                        });
+                        str += "</ul>";
+                        if(hasResult) {
+                            $resultPanel.innerHTML = str;
+                        } else {
+                            $resultPanel.innerHTML = text;
+                        }
+
+                    },
+                    complete: function() {
+                        setTimeout(() => {
+                                const loadingBar = $('.search-loading-bar')
+                                loadingBar.css({
+                                    width:'0%',
+                                    display: 'none'
+                                });
+                        }, 300)
+                    }
+                });
+            })
+
+        });
+    }
+
+    $(document).ready(function() {
+        $('.modal-close').click(function () {
+            $("#u-search").fadeOut();
+            $("body > .wrapper").removeClass("modal-active")
+        })
+
+        $('.modal-overlay').click(function() {
+            $("#u-search").fadeOut();
+            $("body > .wrapper").removeClass("modal-active")
+        })
+        search(null, ".form-search", false)
+        search("#u-search-modal-form .form-input", ".u-search-modal-form", true)
+    })
+</script>
+
+
+
+<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="atom.xml" title="S'Blog" type="application/atom+xml">
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- 头部菜单 -->
+<header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">S&#39; Blog</a></div>
+            <div class="menu navbar-right">
+              <!-- 这里表示的是pc端搜索框 -->
+            
+            <!-- 搜索框 -->
+
+    <div class="search ">
+        <form class="form-search">
+            <input class="input" placeholder="Search！" autocomplete="off" id="pc-search-input"/>
+        </form>
+        <div class="search-btn" onClick="searchToggle()">
+            <img src="../image/search.png" class="search-btn-img" />
+        </div>
+    </div>
+
+
+            
+            <a class="menu-item" href="../archives">Posts</a>
+            
+            <a class="menu-item" href="../category">Categories</a>
+            
+            <a class="menu-item" href="../gallery">Gallery</a>
+            
+        </div>
+    </div>
+</nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">S&#39; Blog</a>
+                </div>
+                <!-- 这里表示的是移动端搜索框 -->
+                <div class="navbar-mobile-right">
+               <div class="menu-toggle" onclick="mobileBtn()">&#9776; 目录</div>
+               </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="../archives">Posts</a>
+                
+                    <a class="menu-item" href="../category">Categories</a>
+                
+                    <a class="menu-item" href="../gallery">Gallery</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+
+            <div class="main">
+                
+<!-- 文章正文（Post）页 -->
+<link rel="stylesheet" href="../fonts/iconfont/iconfont.css">
+<div class="container">
+
+
+
+<article class="post-wrap">
+  <header class="post-header">
+    <h1 class="post-title">跳水世界杯志愿活动</h1><br/>
+    
+      <div class="post-meta">
+        
+          Author &nbsp;&nbsp;&nbsp: &nbsp;&nbsp;&nbsp  <a itemprop="author" rel="author" href="/">Sinnerla</a>
+          <br/>
+          
+            <span class="post-time">
+              Date &nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp: &nbsp;&nbsp;&nbsp <a href="#">17 June, 2019</a>
+            </span>
+            <br/>
+            
+              <span class="post-category">
+                Category : &nbsp;&nbsp;&nbsp
+                
+                  <a href="../categories/%E6%80%9D%E8%80%8C%E5%90%8E%E6%84%9F/">思而后感</a>
+                  
+                </span>
+                
+              </div>
+              
+            </header>
+ <div class="post-content">
+   <p>想了很久到底要不要写点儿什么，最后还是觉得应该给这十天一个总结，也好日后有迹可寻。</p>
+<p>说起来真的很意外我能参加这个志愿活动，大概是临近期末大家都在考虑复习的事情。第一天到达场馆的时候，我的心里是很失望的。负责检录的蒋老师和吴老师讲完注意事项就走了，江汉大学的志愿者因为学校近也回去了，我们六个被分到检录的同学在检录室呆了一下午无所事事。但随着比赛的来临，我们的工作也就慢慢步入正轨，每一场比赛前半个小时，每一场比赛的倒数第二轮跳完，无论在做什么，在哪里，都会很自觉地回到检录室。去场地催促运动员，在运动员通道引导运动员，贴牌的，收证的，当然两个组之间也会互相帮忙。除了随队的学长学姐们，我们大概是和运动员们接触得最多的志愿者。<br>到最后，即使对外国人脸盲的我，都能直接想起他们的姓和国籍。<br>最先注意到的是一个埃及的小盆友，在开幕式的时候就注意到这个真的可以直接用英俊形容的少年。可惜发挥的不好没有进到决赛，然后可气的是我居然为了学习失去了和他合影的机会。<br>第一张合影是和加拿大队的Vincent以及他的搭档。<br>然后最先记住姓名的，是一个温柔的加拿大小哥，Philippe，非常有礼貌，给他贴牌之后会笑着说“谢谢”（中文，很多运动员都会说一丢中国话），来取他的运动员证的时候会很腼腆地笑着。<br>接触得最多的是意大利队的按摩师，每一天都会到检录室里占领一张床给队员按摩，最开始按摩师小姐姐看上去很高冷，但后来随着活泼的队员们的依次来访穿插着一些语言交换的活动慢慢对我们的脸有了印象，最后还能直接认出我们，非常开心了，当我们最后问她是否可以和她合影时，她开心地对她身边的意大利小姐姐说：“Did you hear that？With me！Not you！haha！”室友田爷胆子比较大，临走送了她小礼物，我也因此沾光得到了我人生中第一个贴面礼和她的脸书账号。<br>然后还有那个胖胖的黑人官员，虽然只会在部分比赛的检录见到他，但后来也会每一次来都会说hello how are you之类的问候的话语，尤其意外的是他最后还要求要和我们合照。<br>还有加拿大的Rylan小哥哥，其实他比我们小，2002年的小盆友，第一次比赛完进检录室拿卡就被我们这群花痴的老阿姨团团围住要求合影，全程都笑得很可爱，非常治愈，有一次来拿卡的时候还特别开心特别大声地说“谢谢“。<br>另外印象深刻的有比赛之后跑来很无语地告诉我们，他的姓念黄不是尧的马来西亚小哥，很自觉来检录然后开心地说“American is always on time”的美国小姐姐，高冷的统一剃了寸头的俄罗斯小哥（除了一个Nikita，我个人觉得他长得有点像skam里面的小天使），逗逼的意大利小哥和教练，长得神似普金的威廉姆斯小哥，既听不懂汉语也听不懂英语的但真的很努力的朝鲜队员，38岁的日本超级老将，帅气的英国小哥Jack Laugher，还有一些已经有些忘记的面孔。<br>说完歪果仁，再来说说中国队，这是我第一次同时很有可能时最后一次如此近距离地接触国家跳水队的队员，首先是练俊杰和司雅杰的混双，两个人都超级帅啊，练俊杰真的长得太好看了，360度无死角的美颜，人也非常有耐心，当时第一天比赛完后有一小撮粉丝在看台上希望和他合影，他就让粉丝把手机递给他，拍了一张把所有人都包进去的自拍又把手机递回去，关键是，他人不高，递手机的时候得使劲儿垫脚，粉丝应当是很幸福的了。<br>任茜接触不多，虽然声名远扬人也很小，但这次大家的目光都基本集中在了她的搭档张家齐身上，小妹妹真的超级萌，声音都是奶奶的，记者采访她问她得了金牌有没有想要的礼物，她说想要芭比娃娃，然后又问她，除了这个还有吗?她说没有了。<br>最后这一天中途遇到学姐带着她出来，她想和啦啦队的小姐姐们合影，小小的一只，最后大家轮流和她合影，尽管她很想回去看比赛但还是一一满足了我们这群老阿姨。<br>然后是安静沉稳的两男子，谢思埸与陈艾森，都是特别有礼貌而且特别有耐心的男子，实力当然更是毋庸置疑。<br>而杨健和曹缘这两个比较二一点儿，杨健比赛前检录的时候对着一个工作人员一展歌喉，比赛完之后来取自己的运动员证，一开口就说找最帅的那个，结果我们全盯着陈艾森的牌子。曹缘第一天比赛完跑到检录室来还和我们一起看了会儿比赛的直播，认真地算了他和谢思埸的分差，最后发现自己少了多少分之后一下子跳起来，说了句“我cao”跑了。<br>而杨昊，真的是非常非常温和的男子，去看台的时候就发现他被人围着，过了很久都没有离开，一直很耐心地满足合影和签名的各种要求，脸上一直带着温和的笑意，说话也不急不缓，有一种翩翩公子的感觉，看台外的人群散了之后，他又被看台上坐在边上的粉丝叫住了给他们签名，直到我走，他还在一边签名一边和粉丝们聊天。<br>说完运动员，再回到检录大队。负责带我们的老师都师出有名，蒋全新老师跑检录室比较勤快一点儿，唠嗑也唠得多一些。讲跳水动作编号，各种跳水赛事，运动员的生活，很多很多，可以算是扫了一丢知识盲区。他还是重庆市的带队教练，施廷懋的教练，国际级裁判。本身也曾经是跳水运动员，讲了一些以前训练的故事，有一点好笑但也有点儿令人感慨，运动员真的不容易，非常辛苦。而另一个吴老师曾经是国家跳水队的一员。<br>有幸还和中国第一位跳水奥运冠军周继红合影，以及经常出在CCTV5采访区的记者杨烁。大家都非常的和善，尤其那位记者甚至还对我们说谢谢赏脸。<br>一周七天，每一天都不一样，每一天都非常精彩，即使回到各自原定的生活轨道中去，大概也会一直笑着。<br>挥挥手，要开始头疼期末的事情啦~</p>
+
+ </div>
+   <section class="post-tags">
+     <div>
+       <span class="tag">
+         
+           
+             <a href="../tags/activities/"><i class="iconfont icon-tag"></i>&nbsp;&nbsp;activities&nbsp;&nbsp;</a>
+           
+         
+       </span>
+     </div>
+     <div>
+       <a href="javascript:window.history.back();">back</a>
+       <span>· </span>
+       <a href="/">home</a>
+     </div>
+   </section>
+   <section class="post-nav">
+     
+       <a class="prev" rel="prev" href="d0ecc019.html">summary2020</a>
+       
+     
+       <a class="next" rel="next" href="d4b64b15.html">人类的大地</a>
+       
+    </section>
+    
+      <section class="post-copyright">
+        
+          <div class="copyright-item">
+            <span>Sinnerla</span>
+          </div>
+          
+        
+        
+        
+          <span>辛拉没有麺，真的没有</span>
+          
+        </section>
+        
+</article>
+
+</div>
+
+
+ <div id="gitalk-container"></div>
+ <!-- Gitalk支持 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+ var gitalk = new Gitalk({
+ clientID: '1ef6686ae0caacdc40c6',
+ clientSecret: '4ba0ba87d81338047baa13bc94f52adac3555323',
+ repo: 'Gitalk_Date',
+ owner: 'Sinnerla',
+ admin: 'Sinnerla',
+ id: location.pathname,
+ labels: 'Gitalk'.split(',').filter(l => l),
+ perPage: 10,
+ pagerDirection: 'last',
+ createIssueManually: true,
+ distractionFreeMode: true
+ })
+ gitalk.render('gitalk-container')
+</script>
+
+
+
+            </div>
+            <!--页脚-->
+<link rel="stylesheet" href="../fonts/iconfont/iconfont.css">
+<footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 美丽的Sinnerla | Powered by
+          <a href="https://hexo.io" target="_blank">Hexo</a> &
+          <a href="https://github.com/Sinnerla/Sinnerla.github.io" target="_blank"><i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> S'blog <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i></a>
+        </span>
+    </div>
+</footer>
+
+    </div>
+    <!-- 搜索功能 -->
+    <div id="u-search">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="container">
+                    <form id="u-search-modal-form" class="u-search-modal-form">
+                        <button type="submit" class="form-submit-btn">
+                            <img src="../image/find.png" class="search-btn-img" />
+                        </button>
+                        <input placeholder="Find?" class="form-input" id="modal-form-input">
+                    </form>
+                    <a class="modal-close">x</a>
+                </div>
+                <div class="search-loading">
+                    <div class="search-loading-bar"></div>
+                </div>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+        <div class="modal-overlay"></div>
+    </div>
+</body>
+</html>

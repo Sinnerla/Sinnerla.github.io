@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="default">
+
+<head>
+    <!-- 网页头部 -->
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+
+    <link rel="icon" href="../favicon.ico">
+
+
+    <meta name="author" content="Sinnerla">
+
+
+    <meta name="subtitle" content="Whatever">
+
+
+    <meta name="description" content="blog of sinnerla">
+
+
+
+<title>summary2020 | S&#39;Blog</title>
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="../css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="../js/script.js"></script>
+    
+    <script src="../js/tocbot.min.js"></script>
+    
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    
+
+
+
+    <script>
+    function searchToggle() {
+        const width = $(document.body).width()
+        if(width > 479) {
+            return;
+        }
+        const search = $('.search');
+        const searchForm = $('.form-search');
+        const menuToggle = $('.menu-toggle');
+        const title = $('.navbar-header-title ');
+
+        if(!search.hasClass("mobile-search")) {
+            search.addClass("mobile-search");
+            menuToggle.addClass("open-search")
+            title.addClass("mobile-title-hidden")
+        } else {
+            search.removeClass("mobile-search");
+            menuToggle.removeClass("open-search")
+            // title.css({visibility: 'visible'})
+            title.removeClass("mobile-title-hidden")
+        }
+    }
+    function search(searchInputEl, formEl, flag) {
+        const path = "/" + "search.json"; // 可以在public 下查看这个search.json
+        $(formEl).submit(function(e){
+            e.preventDefault();
+            let target = null
+            if(searchInputEl == null) {
+                const screenWidth = $(document.body).width();
+                target = screenWidth > 479 ? $('#pc-search-input') : $('#mobile-search-input');
+                console.log(target);
+            } else {
+                target = $(searchInputEl)
+            }
+
+            if(!flag && target.val() === '') {
+                return ;
+            }
+
+            $("#u-search").fadeIn(500, function() {
+                $("body > .wrapper").addClass("modal-active");
+
+                $.ajax({
+                    url: path,
+                    dataType: "json",
+                    beforeSend: function (xhr) {
+                        $input = target.val();
+                        $(".form-input").val($input);
+                        const loadingBar = $('.search-loading-bar')
+                        loadingBar.css({
+                            width:'100%',
+                            display: 'block'
+                        });
+                    },
+                    success: function( datas ) {
+                        console.log(datas);
+                        const $resultPanel = $(".modal-body")[0];
+                        let str = `<ul class="modal-results">`;
+                        var keywords = $(".form-input").val().trim().toLowerCase().split(/[\s\-]+/);
+                        $resultPanel.innerHTML = "";
+                        let hasResult = false
+                        let text = `<div class="no-result">啊哦....</div>`;
+
+                        if ($(".form-input").val().trim().length <= 0) {
+                            // 没有结果
+                            $resultPanel.innerHTML = text;
+                            return;
+                        }
+                        datas.forEach(function (data, index) {
+                            var isMatch = true;
+                            if (!data.title || data.title.trim() === '') {
+                                data.title = "Untitled";
+                            }
+                            var data_title = data.title.trim().toLowerCase();
+                            var data_content = data.content && data.content.trim().replace(/<[^>]+>/g, "").toLowerCase() || '';
+                            var data_url = data.url;
+                            var index_title = -1;
+                            var index_content = -1;
+                            var first_occur = -1;
+                            // only match artiles with not empty contents
+                            if (data_content !== '') {
+                                keywords.forEach(function (keyword, i) {
+                                    index_title = data_title.indexOf(keyword);
+                                    index_content = data_content.indexOf(keyword);
+
+                                    if (index_title < 0 && index_content < 0) {
+                                        isMatch = false;
+                                    } else {
+                                        hasResult = true
+                                        if (index_content < 0) {
+                                            index_content = 0;
+                                        }
+                                        if (i == 0) {
+                                            first_occur = index_content;
+                                        }
+                                    }
+                                });
+                            } else {
+                                isMatch = false;
+                            }
+                            // show search results
+                            if (isMatch) {
+                                str += `<li class='result-item'><a href='${data_url}' class='result-item-detail'> <span class="title">${data_title}</span>`;
+                                var content = data.content.trim().replace(/<[^>]+>/g, "");
+                                if (first_occur >= 0) {
+                                    // cut out 200 characters
+                                    var start = first_occur - 40;
+                                    var end = first_occur + 160;
+
+                                    if (start < 0) {
+                                        start = 0;
+                                    }
+
+                                    if (start == 0) {
+                                        end = 200;
+                                    }
+
+                                    if (end > content.length) {
+                                        end = content.length;
+                                    }
+
+                                    var match_content = content.substring(start, end);
+
+                                    // highlight all keywords
+                                    keywords.forEach(function (keyword) {
+                                        var regS = new RegExp(keyword, "gi");
+                                        match_content = match_content.replace(regS, `<em class="search-keyword">${keyword}</em>`);
+                                    });
+
+                                    str += `<span class="content"> ${match_content} ...</span></a>`;
+                                }
+                                str += "</li>";
+                            }
+                        });
+                        str += "</ul>";
+                        if(hasResult) {
+                            $resultPanel.innerHTML = str;
+                        } else {
+                            $resultPanel.innerHTML = text;
+                        }
+
+                    },
+                    complete: function() {
+                        setTimeout(() => {
+                                const loadingBar = $('.search-loading-bar')
+                                loadingBar.css({
+                                    width:'0%',
+                                    display: 'none'
+                                });
+                        }, 300)
+                    }
+                });
+            })
+
+        });
+    }
+
+    $(document).ready(function() {
+        $('.modal-close').click(function () {
+            $("#u-search").fadeOut();
+            $("body > .wrapper").removeClass("modal-active")
+        })
+
+        $('.modal-overlay').click(function() {
+            $("#u-search").fadeOut();
+            $("body > .wrapper").removeClass("modal-active")
+        })
+        search(null, ".form-search", false)
+        search("#u-search-modal-form .form-input", ".u-search-modal-form", true)
+    })
+</script>
+
+
+
+<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="atom.xml" title="S'Blog" type="application/atom+xml">
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- 头部菜单 -->
+<header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">S&#39; Blog</a></div>
+            <div class="menu navbar-right">
+              <!-- 这里表示的是pc端搜索框 -->
+            
+            <!-- 搜索框 -->
+
+    <div class="search ">
+        <form class="form-search">
+            <input class="input" placeholder="Search！" autocomplete="off" id="pc-search-input"/>
+        </form>
+        <div class="search-btn" onClick="searchToggle()">
+            <img src="../image/search.png" class="search-btn-img" />
+        </div>
+    </div>
+
+
+            
+            <a class="menu-item" href="../archives">Posts</a>
+            
+            <a class="menu-item" href="../category">Categories</a>
+            
+            <a class="menu-item" href="../gallery">Gallery</a>
+            
+        </div>
+    </div>
+</nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">S&#39; Blog</a>
+                </div>
+                <!-- 这里表示的是移动端搜索框 -->
+                <div class="navbar-mobile-right">
+               <div class="menu-toggle" onclick="mobileBtn()">&#9776; 目录</div>
+               </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="../archives">Posts</a>
+                
+                    <a class="menu-item" href="../category">Categories</a>
+                
+                    <a class="menu-item" href="../gallery">Gallery</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+
+            <div class="main">
+                
+<!-- 文章正文（Post）页 -->
+<link rel="stylesheet" href="../fonts/iconfont/iconfont.css">
+<div class="container">
+
+
+
+<article class="post-wrap">
+  <header class="post-header">
+    <h1 class="post-title">summary2020</h1><br/>
+    
+      <div class="post-meta">
+        
+          Author &nbsp;&nbsp;&nbsp: &nbsp;&nbsp;&nbsp  <a itemprop="author" rel="author" href="/">Sinnerla</a>
+          <br/>
+          
+            <span class="post-time">
+              Date &nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp: &nbsp;&nbsp;&nbsp <a href="#">28 February, 2020</a>
+            </span>
+            <br/>
+            
+              <span class="post-category">
+                Category : &nbsp;&nbsp;&nbsp
+                
+                  <a href="../categories/%E6%80%9D%E8%80%8C%E5%90%8E%E6%84%9F/">思而后感</a>
+                  
+                </span>
+                
+              </div>
+              
+            </header>
+ <div class="post-content">
+   <p>一年以来，无功无过，没有获得任何奖项，也没有任何大的过失。有一些满怀信心起航的时刻，但是无一例外都夭折结尾。<br>选课选得很足量，修完2020上学年，毕业就不差学分了，但都几乎泛泛而过，没有进一步的深入学习。学习上不用功，思想上没有进步，翻看以前的学年小结，发现果不其然原地踏步多年，从年纪上算都快要毕业了，还没有建立起良好的自我管理与自主学习的习惯。成绩也不好，总的说来，又是毫无建树的一年。唯一的进步在于，相比刚入大学的迷茫，现在我不迷茫了。这就好像是，刚进大学有太多选择，有些人选择一个然后坚持走下去，我就是那种每个选择都想试试，每个选择都没有走远的人。但也没有后悔，许多人会后悔大学虚度时光，但其实实际的情况是，无论有多少次机会重来，会在大学虚度时光的人就是会一次次虚度时光，我太了解自己，这是必然的过程，所以没可追怀的内容。如果选择一条道走到黑是成功的必要条件，那我除了下辈子没什么可指望的。以前我老是想入非非，以后想做什么什么职业，大一刚进校立志成为翻译，还要学多国语言，大二考雅思托福GRE，大三出国交换之类的。希望毕业时原来大一时翻译1708班的班主任能够忘掉要把我们大一的豪言壮语寄给我们的事情，太羞耻。<br>现在这个关口上，曾经和我一起入校的同学们面临人生的重大抉择，工作还是考研，怎么找工作，考什么大学，再回顾大学三年，我发现还是相当有远见，毕竟当年转专业我就想过翻译太难，考研选方向也很痛苦。大多数人引导人生的话是‘来都来了’，有些人顺其自然是要保持高水准，有的人顺其自然就只是划划水，我大概算后者，但又不太一样，我非要选个自己喜欢的地方划水。去年学年小结我就写了，每年一结就会发现每一年的轮廓大致上都是一样的，三流学生的日常，像一根无限延长的直线，虽然望不到边，但是心里清楚怎样都不会有起伏。</p>
+
+ </div>
+   <section class="post-tags">
+     <div>
+       <span class="tag">
+         
+           
+             <a href="../tags/think/"><i class="iconfont icon-tag"></i>&nbsp;&nbsp;think&nbsp;&nbsp;</a>
+           
+         
+       </span>
+     </div>
+     <div>
+       <a href="javascript:window.history.back();">back</a>
+       <span>· </span>
+       <a href="/">home</a>
+     </div>
+   </section>
+   <section class="post-nav">
+     
+       <a class="prev" rel="prev" href="feada8df.html">一个十八岁的男孩决定去死</a>
+       
+     
+       <a class="next" rel="next" href="afa3d00e.html">跳水世界杯志愿活动</a>
+       
+    </section>
+    
+      <section class="post-copyright">
+        
+          <div class="copyright-item">
+            <span>Sinnerla</span>
+          </div>
+          
+        
+        
+        
+          <span>辛拉没有麺，真的没有</span>
+          
+        </section>
+        
+</article>
+
+</div>
+
+
+ <div id="gitalk-container"></div>
+ <!-- Gitalk支持 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+ var gitalk = new Gitalk({
+ clientID: '1ef6686ae0caacdc40c6',
+ clientSecret: '4ba0ba87d81338047baa13bc94f52adac3555323',
+ repo: 'Gitalk_Date',
+ owner: 'Sinnerla',
+ admin: 'Sinnerla',
+ id: location.pathname,
+ labels: 'Gitalk'.split(',').filter(l => l),
+ perPage: 10,
+ pagerDirection: 'last',
+ createIssueManually: true,
+ distractionFreeMode: true
+ })
+ gitalk.render('gitalk-container')
+</script>
+
+
+
+            </div>
+            <!--页脚-->
+<link rel="stylesheet" href="../fonts/iconfont/iconfont.css">
+<footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 美丽的Sinnerla | Powered by
+          <a href="https://hexo.io" target="_blank">Hexo</a> &
+          <a href="https://github.com/Sinnerla/Sinnerla.github.io" target="_blank"><i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> S'blog <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i></a>
+        </span>
+    </div>
+</footer>
+
+    </div>
+    <!-- 搜索功能 -->
+    <div id="u-search">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="container">
+                    <form id="u-search-modal-form" class="u-search-modal-form">
+                        <button type="submit" class="form-submit-btn">
+                            <img src="../image/find.png" class="search-btn-img" />
+                        </button>
+                        <input placeholder="Find?" class="form-input" id="modal-form-input">
+                    </form>
+                    <a class="modal-close">x</a>
+                </div>
+                <div class="search-loading">
+                    <div class="search-loading-bar"></div>
+                </div>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+        <div class="modal-overlay"></div>
+    </div>
+</body>
+</html>

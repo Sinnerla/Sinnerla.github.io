@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="default">
+
+<head>
+    <!-- 网页头部 -->
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+
+    <link rel="icon" href="../favicon.ico">
+
+
+    <meta name="author" content="Sinnerla">
+
+
+    <meta name="subtitle" content="Whatever">
+
+
+    <meta name="description" content="blog of sinnerla">
+
+
+
+<title>一个十八岁的男孩决定去死 | S&#39;Blog</title>
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="../css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="../js/script.js"></script>
+    
+    <script src="../js/tocbot.min.js"></script>
+    
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    
+
+
+
+    <script>
+    function searchToggle() {
+        const width = $(document.body).width()
+        if(width > 479) {
+            return;
+        }
+        const search = $('.search');
+        const searchForm = $('.form-search');
+        const menuToggle = $('.menu-toggle');
+        const title = $('.navbar-header-title ');
+
+        if(!search.hasClass("mobile-search")) {
+            search.addClass("mobile-search");
+            menuToggle.addClass("open-search")
+            title.addClass("mobile-title-hidden")
+        } else {
+            search.removeClass("mobile-search");
+            menuToggle.removeClass("open-search")
+            // title.css({visibility: 'visible'})
+            title.removeClass("mobile-title-hidden")
+        }
+    }
+    function search(searchInputEl, formEl, flag) {
+        const path = "/" + "search.json"; // 可以在public 下查看这个search.json
+        $(formEl).submit(function(e){
+            e.preventDefault();
+            let target = null
+            if(searchInputEl == null) {
+                const screenWidth = $(document.body).width();
+                target = screenWidth > 479 ? $('#pc-search-input') : $('#mobile-search-input');
+                console.log(target);
+            } else {
+                target = $(searchInputEl)
+            }
+
+            if(!flag && target.val() === '') {
+                return ;
+            }
+
+            $("#u-search").fadeIn(500, function() {
+                $("body > .wrapper").addClass("modal-active");
+
+                $.ajax({
+                    url: path,
+                    dataType: "json",
+                    beforeSend: function (xhr) {
+                        $input = target.val();
+                        $(".form-input").val($input);
+                        const loadingBar = $('.search-loading-bar')
+                        loadingBar.css({
+                            width:'100%',
+                            display: 'block'
+                        });
+                    },
+                    success: function( datas ) {
+                        console.log(datas);
+                        const $resultPanel = $(".modal-body")[0];
+                        let str = `<ul class="modal-results">`;
+                        var keywords = $(".form-input").val().trim().toLowerCase().split(/[\s\-]+/);
+                        $resultPanel.innerHTML = "";
+                        let hasResult = false
+                        let text = `<div class="no-result">啊哦....</div>`;
+
+                        if ($(".form-input").val().trim().length <= 0) {
+                            // 没有结果
+                            $resultPanel.innerHTML = text;
+                            return;
+                        }
+                        datas.forEach(function (data, index) {
+                            var isMatch = true;
+                            if (!data.title || data.title.trim() === '') {
+                                data.title = "Untitled";
+                            }
+                            var data_title = data.title.trim().toLowerCase();
+                            var data_content = data.content && data.content.trim().replace(/<[^>]+>/g, "").toLowerCase() || '';
+                            var data_url = data.url;
+                            var index_title = -1;
+                            var index_content = -1;
+                            var first_occur = -1;
+                            // only match artiles with not empty contents
+                            if (data_content !== '') {
+                                keywords.forEach(function (keyword, i) {
+                                    index_title = data_title.indexOf(keyword);
+                                    index_content = data_content.indexOf(keyword);
+
+                                    if (index_title < 0 && index_content < 0) {
+                                        isMatch = false;
+                                    } else {
+                                        hasResult = true
+                                        if (index_content < 0) {
+                                            index_content = 0;
+                                        }
+                                        if (i == 0) {
+                                            first_occur = index_content;
+                                        }
+                                    }
+                                });
+                            } else {
+                                isMatch = false;
+                            }
+                            // show search results
+                            if (isMatch) {
+                                str += `<li class='result-item'><a href='${data_url}' class='result-item-detail'> <span class="title">${data_title}</span>`;
+                                var content = data.content.trim().replace(/<[^>]+>/g, "");
+                                if (first_occur >= 0) {
+                                    // cut out 200 characters
+                                    var start = first_occur - 40;
+                                    var end = first_occur + 160;
+
+                                    if (start < 0) {
+                                        start = 0;
+                                    }
+
+                                    if (start == 0) {
+                                        end = 200;
+                                    }
+
+                                    if (end > content.length) {
+                                        end = content.length;
+                                    }
+
+                                    var match_content = content.substring(start, end);
+
+                                    // highlight all keywords
+                                    keywords.forEach(function (keyword) {
+                                        var regS = new RegExp(keyword, "gi");
+                                        match_content = match_content.replace(regS, `<em class="search-keyword">${keyword}</em>`);
+                                    });
+
+                                    str += `<span class="content"> ${match_content} ...</span></a>`;
+                                }
+                                str += "</li>";
+                            }
+                        });
+                        str += "</ul>";
+                        if(hasResult) {
+                            $resultPanel.innerHTML = str;
+                        } else {
+                            $resultPanel.innerHTML = text;
+                        }
+
+                    },
+                    complete: function() {
+                        setTimeout(() => {
+                                const loadingBar = $('.search-loading-bar')
+                                loadingBar.css({
+                                    width:'0%',
+                                    display: 'none'
+                                });
+                        }, 300)
+                    }
+                });
+            })
+
+        });
+    }
+
+    $(document).ready(function() {
+        $('.modal-close').click(function () {
+            $("#u-search").fadeOut();
+            $("body > .wrapper").removeClass("modal-active")
+        })
+
+        $('.modal-overlay').click(function() {
+            $("#u-search").fadeOut();
+            $("body > .wrapper").removeClass("modal-active")
+        })
+        search(null, ".form-search", false)
+        search("#u-search-modal-form .form-input", ".u-search-modal-form", true)
+    })
+</script>
+
+
+
+<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="atom.xml" title="S'Blog" type="application/atom+xml">
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- 头部菜单 -->
+<header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">S&#39; Blog</a></div>
+            <div class="menu navbar-right">
+              <!-- 这里表示的是pc端搜索框 -->
+            
+            <!-- 搜索框 -->
+
+    <div class="search ">
+        <form class="form-search">
+            <input class="input" placeholder="Search！" autocomplete="off" id="pc-search-input"/>
+        </form>
+        <div class="search-btn" onClick="searchToggle()">
+            <img src="../image/search.png" class="search-btn-img" />
+        </div>
+    </div>
+
+
+            
+            <a class="menu-item" href="../archives">Posts</a>
+            
+            <a class="menu-item" href="../category">Categories</a>
+            
+            <a class="menu-item" href="../gallery">Gallery</a>
+            
+        </div>
+    </div>
+</nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">S&#39; Blog</a>
+                </div>
+                <!-- 这里表示的是移动端搜索框 -->
+                <div class="navbar-mobile-right">
+               <div class="menu-toggle" onclick="mobileBtn()">&#9776; 目录</div>
+               </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="../archives">Posts</a>
+                
+                    <a class="menu-item" href="../category">Categories</a>
+                
+                    <a class="menu-item" href="../gallery">Gallery</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+
+            <div class="main">
+                
+<!-- 文章正文（Post）页 -->
+<link rel="stylesheet" href="../fonts/iconfont/iconfont.css">
+<div class="container">
+
+
+  <!-- 文章正文侧边栏 -->
+<div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+</script>
+
+  
+
+<article class="post-wrap">
+  <header class="post-header">
+    <h1 class="post-title">一个十八岁的男孩决定去死</h1><br/>
+    
+      <div class="post-meta">
+        
+          Author &nbsp;&nbsp;&nbsp: &nbsp;&nbsp;&nbsp  <a itemprop="author" rel="author" href="/">Sinnerla</a>
+          <br/>
+          
+            <span class="post-time">
+              Date &nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp: &nbsp;&nbsp;&nbsp <a href="#">5 April, 2020</a>
+            </span>
+            <br/>
+            
+              <span class="post-category">
+                Category : &nbsp;&nbsp;&nbsp
+                
+                  <a href="../categories/shining/">shining</a>
+                  
+                </span>
+                
+              </div>
+              
+            </header>
+ <div class="post-content">
+   <h1 id="最后的决定"><a href="#最后的决定" class="headerlink" title="最后的决定"></a>最后的决定</h1><h2 id="1"><a href="#1" class="headerlink" title="1"></a>1</h2><blockquote>
+<p>我的离开不需要追责任何人，这是我个体的自由选择。</p>
+</blockquote>
+<p>生活在这片土地十九年，愈发地认识到一切都在赴往无法挽回，一切都在腐烂，未来对我来说没有吸引力，我可以轻松地看见自己框架以及那个被囚困中的我。死亡是一张解脱的门票，我知道自己的死相会很难看，不可名状的器官也许是脑浆建溅绿化植物上，黑色的血液不断渗出。从高楼坠下的那一刻我最能体会生命的窘迫，而死亡赋予它意义。</p>
+<h2 id="2"><a href="#2" class="headerlink" title="2"></a>2</h2><blockquote>
+<p>十八岁的我永远会嘲笑三十岁的我，这是我十八岁生日认识到的结论。</p>
+</blockquote>
+<p>我嘲笑，藐视那些所谓的大人，我的父母，老师，还有乱七八糟的领导。高中三年的班主任让我认识到你们这些成年人有多么荒唐，每次他们训话我就想到他们也是这样被他们的领导训话的，我也意识到将来我也会同他们一样被训话然后去训话低我一级的人。这样的权力关系不对等让一切失去沟通的可能，只有居高临下的命令以及欺诈自己的认同，如同三十岁的我一样。也许领导也有领导，<strong>这上面永远没有尽头，也许人类找不出巴别塔，或许可以把自己叠上去。</strong></p>
+<h2 id="3"><a href="#3" class="headerlink" title="3"></a>3</h2><p>我看过很多劝别人不要轻生的视频或者文章，但对于我来说实在是过于苍白，我又想到搜索自杀便弹出来的心理咨询电话就像你卸载软件时的确认弹窗，不过是苦苦挽留。我更加确认我的选择不是草率的轻生。你说这世界缤纷多彩，可天空不也还是一无所有。再明亮的月亮却依然什么也照不亮。</p>
+<h2 id="4"><a href="#4" class="headerlink" title="4"></a>4</h2><p>父权，我对这个世界最可恨的就是无处不在的结构性权力不平等，也许可以欺骗自己顺依父权，像父辈一样相信明天会更好，但我天性敏感，总是能发现它的荒谬，但我却依然无能为力，只得用发笑来掩盖自己的无能。我们总是用发笑解决一切，一切沟通都通过流行的梗或者笑点结束，仿佛我们拒绝一切说教，在达到高处前就摔得粉碎，宛如西西弗斯式的诅咒。但第一个人类在提出私有制之时，父权便发芽了。作为男性享受着特权的同时也因为自己是同性恋敏锐地嗅出它并非我能傍依，因为它凝视着每一个人。它在饭桌上由油腻男性说出的黄色笑话中，在男生擅长理科的偏见中，在女性因性别而受到歧视中，它凝视着一切。</p>
+<p>&emsp;</p>
+<h1 id="遗书如下"><a href="#遗书如下" class="headerlink" title="遗书如下"></a>遗书如下</h1><h2 id="1-1"><a href="#1-1" class="headerlink" title="1"></a>1</h2><p>这是给我母亲的，我写这份文字的时候，你在厨房煮菜，从事着数十年如一日却没有一分报酬的工作因为你母亲和妻子的身份。我知道你会因为我的离去而伤心，但这并不怪你，这是我的选择。你一直都争强好胜，对你生活中的每个人都如此，但还是希望你能更加柔和一些。去寻找一些依靠吧，金钱可以，事业也可以。我建议你去看心理医生，能更好地帮你走出阴影，母子一场，我未曾彼此亏欠，你只是一个普通母亲。</p>
+<h2 id="2-1"><a href="#2-1" class="headerlink" title="2"></a>2</h2><p>这是给我父亲的，父亲这个角色最为有趣的地方在于，如果你没能在某个时刻成为他的英雄，那必须在某个时刻会成为他的敌人。显然你是后者，但还是那句话我的离开不怪任何人，当然包括你。其实你一样只是个普通的父亲，你在维护自己的父权时，手法还是笨拙，你给予我物质，也给予我爱，你没有给予的是尊重，但我相信你的父亲也没有给予你同样的东西，当你说出我和三十一样的时候我真的很伤心，不过是你养的狗，你开心的时候给我几百块，你希望我像三十一样，蹭蹭你的脚。但我不会的，无论你给予我多少钱，我都会反抗你，反抗父权，你可能一辈子不会了解父权有何含义，但不重要了父亲。的确，我和三十一样，天性骄纵，我们都会打开那扇门。不要再养狗了，四条已经没了三条。我希望你也和妈妈一样去看医生，如果她很伤心一定要陪伴她，因为她很爱我，也对我有很多期望，我离开的话最伤心的人一定是她。别再辜负她了，我们都亏欠她太多。</p>
+<h2 id="3-1"><a href="#3-1" class="headerlink" title="3"></a>3</h2><p>这是给我姐姐的，小时候我天天和你抢东西，大人总会偏袒我，没人会和你争了。我同样一点也不怪你，因为小时候我的确很过分，我祝福你姐姐，祝愿你以后的人生能如你所愿。</p>
+<h1 id="END"><a href="#END" class="headerlink" title="END"></a>END</h1>
+ </div>
+   <section class="post-tags">
+     <div>
+       <span class="tag">
+         
+           
+             <a href="../tags/%E7%94%9F/"><i class="iconfont icon-tag"></i>&nbsp;&nbsp;生&nbsp;&nbsp;</a>
+           
+         
+       </span>
+     </div>
+     <div>
+       <a href="javascript:window.history.back();">back</a>
+       <span>· </span>
+       <a href="/">home</a>
+     </div>
+   </section>
+   <section class="post-nav">
+     
+       <a class="prev" rel="prev" href="dfd40662.html">黑暗骑士崛起</a>
+       
+     
+       <a class="next" rel="next" href="d0ecc019.html">summary2020</a>
+       
+    </section>
+    
+      <section class="post-copyright">
+        
+          <div class="copyright-item">
+            <span>Sinnerla</span>
+          </div>
+          
+        
+        
+        
+          <span>辛拉没有麺，真的没有</span>
+          
+        </section>
+        
+</article>
+
+</div>
+
+
+ <div id="gitalk-container"></div>
+ <!-- Gitalk支持 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+ var gitalk = new Gitalk({
+ clientID: '1ef6686ae0caacdc40c6',
+ clientSecret: '4ba0ba87d81338047baa13bc94f52adac3555323',
+ repo: 'Gitalk_Date',
+ owner: 'Sinnerla',
+ admin: 'Sinnerla',
+ id: location.pathname,
+ labels: 'Gitalk'.split(',').filter(l => l),
+ perPage: 10,
+ pagerDirection: 'last',
+ createIssueManually: true,
+ distractionFreeMode: true
+ })
+ gitalk.render('gitalk-container')
+</script>
+
+
+
+            </div>
+            <!--页脚-->
+<link rel="stylesheet" href="../fonts/iconfont/iconfont.css">
+<footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 美丽的Sinnerla | Powered by
+          <a href="https://hexo.io" target="_blank">Hexo</a> &
+          <a href="https://github.com/Sinnerla/Sinnerla.github.io" target="_blank"><i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> S'blog <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i></a>
+        </span>
+    </div>
+</footer>
+
+    </div>
+    <!-- 搜索功能 -->
+    <div id="u-search">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="container">
+                    <form id="u-search-modal-form" class="u-search-modal-form">
+                        <button type="submit" class="form-submit-btn">
+                            <img src="../image/find.png" class="search-btn-img" />
+                        </button>
+                        <input placeholder="Find?" class="form-input" id="modal-form-input">
+                    </form>
+                    <a class="modal-close">x</a>
+                </div>
+                <div class="search-loading">
+                    <div class="search-loading-bar"></div>
+                </div>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+        <div class="modal-overlay"></div>
+    </div>
+</body>
+</html>

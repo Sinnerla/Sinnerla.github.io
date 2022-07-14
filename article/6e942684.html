@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="default">
+
+<head>
+    <!-- 网页头部 -->
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+
+    <link rel="icon" href="../favicon.ico">
+
+
+    <meta name="author" content="Sinnerla">
+
+
+    <meta name="subtitle" content="Whatever">
+
+
+    <meta name="description" content="blog of sinnerla">
+
+
+
+<title>自深深处 | S&#39;Blog</title>
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="../css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="../js/script.js"></script>
+    
+    <script src="../js/tocbot.min.js"></script>
+    
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    
+
+
+
+    <script>
+    function searchToggle() {
+        const width = $(document.body).width()
+        if(width > 479) {
+            return;
+        }
+        const search = $('.search');
+        const searchForm = $('.form-search');
+        const menuToggle = $('.menu-toggle');
+        const title = $('.navbar-header-title ');
+
+        if(!search.hasClass("mobile-search")) {
+            search.addClass("mobile-search");
+            menuToggle.addClass("open-search")
+            title.addClass("mobile-title-hidden")
+        } else {
+            search.removeClass("mobile-search");
+            menuToggle.removeClass("open-search")
+            // title.css({visibility: 'visible'})
+            title.removeClass("mobile-title-hidden")
+        }
+    }
+    function search(searchInputEl, formEl, flag) {
+        const path = "/" + "search.json"; // 可以在public 下查看这个search.json
+        $(formEl).submit(function(e){
+            e.preventDefault();
+            let target = null
+            if(searchInputEl == null) {
+                const screenWidth = $(document.body).width();
+                target = screenWidth > 479 ? $('#pc-search-input') : $('#mobile-search-input');
+                console.log(target);
+            } else {
+                target = $(searchInputEl)
+            }
+
+            if(!flag && target.val() === '') {
+                return ;
+            }
+
+            $("#u-search").fadeIn(500, function() {
+                $("body > .wrapper").addClass("modal-active");
+
+                $.ajax({
+                    url: path,
+                    dataType: "json",
+                    beforeSend: function (xhr) {
+                        $input = target.val();
+                        $(".form-input").val($input);
+                        const loadingBar = $('.search-loading-bar')
+                        loadingBar.css({
+                            width:'100%',
+                            display: 'block'
+                        });
+                    },
+                    success: function( datas ) {
+                        console.log(datas);
+                        const $resultPanel = $(".modal-body")[0];
+                        let str = `<ul class="modal-results">`;
+                        var keywords = $(".form-input").val().trim().toLowerCase().split(/[\s\-]+/);
+                        $resultPanel.innerHTML = "";
+                        let hasResult = false
+                        let text = `<div class="no-result">啊哦....</div>`;
+
+                        if ($(".form-input").val().trim().length <= 0) {
+                            // 没有结果
+                            $resultPanel.innerHTML = text;
+                            return;
+                        }
+                        datas.forEach(function (data, index) {
+                            var isMatch = true;
+                            if (!data.title || data.title.trim() === '') {
+                                data.title = "Untitled";
+                            }
+                            var data_title = data.title.trim().toLowerCase();
+                            var data_content = data.content && data.content.trim().replace(/<[^>]+>/g, "").toLowerCase() || '';
+                            var data_url = data.url;
+                            var index_title = -1;
+                            var index_content = -1;
+                            var first_occur = -1;
+                            // only match artiles with not empty contents
+                            if (data_content !== '') {
+                                keywords.forEach(function (keyword, i) {
+                                    index_title = data_title.indexOf(keyword);
+                                    index_content = data_content.indexOf(keyword);
+
+                                    if (index_title < 0 && index_content < 0) {
+                                        isMatch = false;
+                                    } else {
+                                        hasResult = true
+                                        if (index_content < 0) {
+                                            index_content = 0;
+                                        }
+                                        if (i == 0) {
+                                            first_occur = index_content;
+                                        }
+                                    }
+                                });
+                            } else {
+                                isMatch = false;
+                            }
+                            // show search results
+                            if (isMatch) {
+                                str += `<li class='result-item'><a href='${data_url}' class='result-item-detail'> <span class="title">${data_title}</span>`;
+                                var content = data.content.trim().replace(/<[^>]+>/g, "");
+                                if (first_occur >= 0) {
+                                    // cut out 200 characters
+                                    var start = first_occur - 40;
+                                    var end = first_occur + 160;
+
+                                    if (start < 0) {
+                                        start = 0;
+                                    }
+
+                                    if (start == 0) {
+                                        end = 200;
+                                    }
+
+                                    if (end > content.length) {
+                                        end = content.length;
+                                    }
+
+                                    var match_content = content.substring(start, end);
+
+                                    // highlight all keywords
+                                    keywords.forEach(function (keyword) {
+                                        var regS = new RegExp(keyword, "gi");
+                                        match_content = match_content.replace(regS, `<em class="search-keyword">${keyword}</em>`);
+                                    });
+
+                                    str += `<span class="content"> ${match_content} ...</span></a>`;
+                                }
+                                str += "</li>";
+                            }
+                        });
+                        str += "</ul>";
+                        if(hasResult) {
+                            $resultPanel.innerHTML = str;
+                        } else {
+                            $resultPanel.innerHTML = text;
+                        }
+
+                    },
+                    complete: function() {
+                        setTimeout(() => {
+                                const loadingBar = $('.search-loading-bar')
+                                loadingBar.css({
+                                    width:'0%',
+                                    display: 'none'
+                                });
+                        }, 300)
+                    }
+                });
+            })
+
+        });
+    }
+
+    $(document).ready(function() {
+        $('.modal-close').click(function () {
+            $("#u-search").fadeOut();
+            $("body > .wrapper").removeClass("modal-active")
+        })
+
+        $('.modal-overlay').click(function() {
+            $("#u-search").fadeOut();
+            $("body > .wrapper").removeClass("modal-active")
+        })
+        search(null, ".form-search", false)
+        search("#u-search-modal-form .form-input", ".u-search-modal-form", true)
+    })
+</script>
+
+
+
+<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="atom.xml" title="S'Blog" type="application/atom+xml">
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- 头部菜单 -->
+<header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">S&#39; Blog</a></div>
+            <div class="menu navbar-right">
+              <!-- 这里表示的是pc端搜索框 -->
+            
+            <!-- 搜索框 -->
+
+    <div class="search ">
+        <form class="form-search">
+            <input class="input" placeholder="Search！" autocomplete="off" id="pc-search-input"/>
+        </form>
+        <div class="search-btn" onClick="searchToggle()">
+            <img src="../image/search.png" class="search-btn-img" />
+        </div>
+    </div>
+
+
+            
+            <a class="menu-item" href="../archives">Posts</a>
+            
+            <a class="menu-item" href="../category">Categories</a>
+            
+            <a class="menu-item" href="../gallery">Gallery</a>
+            
+        </div>
+    </div>
+</nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">S&#39; Blog</a>
+                </div>
+                <!-- 这里表示的是移动端搜索框 -->
+                <div class="navbar-mobile-right">
+               <div class="menu-toggle" onclick="mobileBtn()">&#9776; 目录</div>
+               </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="../archives">Posts</a>
+                
+                    <a class="menu-item" href="../category">Categories</a>
+                
+                    <a class="menu-item" href="../gallery">Gallery</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+
+            <div class="main">
+                
+<!-- 文章正文（Post）页 -->
+<link rel="stylesheet" href="../fonts/iconfont/iconfont.css">
+<div class="container">
+
+
+  <!-- 文章正文侧边栏 -->
+<div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+</script>
+
+  
+
+<article class="post-wrap">
+  <header class="post-header">
+    <h1 class="post-title">自深深处</h1><br/>
+    
+      <div class="post-meta">
+        
+          Author &nbsp;&nbsp;&nbsp: &nbsp;&nbsp;&nbsp  <a itemprop="author" rel="author" href="/">Sinnerla</a>
+          <br/>
+          
+            <span class="post-time">
+              Date &nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp: &nbsp;&nbsp;&nbsp <a href="#">1 May, 2022</a>
+            </span>
+            <br/>
+            
+              <span class="post-category">
+                Category : &nbsp;&nbsp;&nbsp
+                
+                  <a href="../categories/%E5%91%93%E8%AF%AD/">呓语</a>
+                  
+                </span>
+                
+              </div>
+              
+            </header>
+ <div class="post-content">
+   <h1 id="어떻게-말해"><a href="#어떻게-말해" class="headerlink" title="어떻게 말해"></a>어떻게 말해</h1><p>怎么说呢，很难起头去讲清楚什么事情，今天是因为和妈妈聊到了我的感受，有时候不能用情绪去定义，更像是一种状态，所以情绪疏导并没有什么用，我并不需要哭一哭来让自己好受，哭是一些较激烈状态下的自然反应<br>但我非要讲得这么清楚有时候也是一种残忍</p>
+<h1 id="2016-02-03"><a href="#2016-02-03" class="headerlink" title="2016-02-03"></a>2016-02-03</h1><p>今早因手机与母亲置气，我第一次有了一种别样的感觉，说不上是什么，总之令人作呕。我大概，是生气的，可是我实在是不知哪里又可以让我生气，我干呕两次，那滋味实在难受，做作业吧，写着写着，头痛得不得了我居然哭了，我以为我的泪腺大概失去作用的时候，我哭了，不是眼眶湿润，而是真真地流下几滴泪来。我觉得很不知自己的想法，就这样吧，谁管呢？近来我越发觉得有一种情绪的滋长，悲哀？大概是吧，我什么也不想管，什么也不想看。</p>
+<h1 id="2016-03-09"><a href="#2016-03-09" class="headerlink" title="2016-03-09"></a>2016-03-09</h1><p>我心中当然清楚这样不可行，可是厌倦如潮水一般袭来，淹没我，带走我，我忽然就想起来郑珊曾说的：脸好尴尬。我曾笑过的，如今我竟理解了。摆弄不出正确的表情，牵动脸部的肌肉变得实在困难。最后呈现出一种半成品式的尴尬。周期性的厌倦成了最大的敌人，曾经它让我想死去，如今它使我沉溺于梦里。那些深夜的时光是我一天中最舒适最安心的。可这样地矛盾，熬了这些美妙的夜晚，第二天的精神会好吗？一方面我苦恼，长时间的晕眩和困意，一方面我痴迷，像赌徒一样地把夜晚的时间赌在黑暗的桌上。一边我担心熬夜对身体的负荷，一边又像是吸毒一样无法自拔。懒是贪玩的一种方式，它得要求懒人把慵懒当作娱乐，可以长时间倚在沙发上发呆，把一动不动作为得到乐趣的方法。太杂乱了，不管是这个活生生的世界，还是人的心。杂乱得让人厌恶整理。</p>
+<h1 id="2016-04-26"><a href="#2016-04-26" class="headerlink" title="2016-04-26"></a>2016-04-26</h1><p>晚上我散步，天空中没有星星，吵闹，乱糟糟，十字路口的斑马线规划得很不科学，行人们集体忽略那几个九步远的人行道，我一个人固执地等待，十六秒，六十秒，十六秒，身边的人总是比我快比我不耐烦，走过一整排的车位，那些在夜晚暗淡的轿车屁股和头交错着，参差不齐，有种好笑的感觉，我一直慢慢走，不敢看迎面走来的人的表情，不敢听擦肩而过的人的声音，只有将目光流连在天空和脚尖和大树，将双耳塞满强烈又宁静的旋律，强烈让我忘记嘈杂，宁静使我继续慢慢走，今天晚上天空中没有星星。</p>
+<h1 id="2016-05-07"><a href="#2016-05-07" class="headerlink" title="2016-05-07"></a>2016-05-07</h1><p>我之所以更愿意阅读，那只不过是因为爱做白日梦。读了高深的，好像自己真很了不起一样，读了简单的，又好像自己很聪明一样。听着别人的赞美，不自觉地也会飘起来，脱离这个世界，脱离这个身体。我小心地掩饰，努力地淡然，可心里早就沸腾不止。为什么我会生活在这样一个家里？为什么我的父母不能使我发自内心地信服和感到安全？为什么我这么虚荣却又这么渺小？我也会向往那些美的，闪亮的，炫目的，可是我要装作不喜欢，不在意，不向往。我热情，乐此不疲，又累又得意，又烦又痴迷。我矛盾，所以我痛苦，我明白这样不好，可你该怎样让财奴视金钱如粪土，叫赌徒停止下赌注？我不知道，所以我迷茫，看再多的书都没法拯救我，他们只能让我沉迷在我看着它们的那点儿时间，他们没法教我变得高尚，我这个人，实在差劲…</p>
+<h1 id="2016-11-23"><a href="#2016-11-23" class="headerlink" title="2016-11-23"></a>2016-11-23</h1><p>奇怪，真是奇怪，为什么其他人不会呢？</p>
+<p>为什么我一定要经历这种周期性的失落呢</p>
+<p>不管一周前我还如何壮志豪情</p>
+<p>最终都会输给一种来源于大脑的情绪</p>
+<p>一种窒息痛苦哽咽委屈，我简直把所有的伤痛都用来描写这种失落</p>
+<p>到底为什么？为什么它会出现？</p>
+<p>它支配我，逼着我流泪，逼着我呆滞</p>
+<p>我知道它来时我有个好去处，可是高三这个金光闪闪的两个字挡住了我所有的逃路</p>
+<p>我只能在角落里发抖，像只阴影中绝望的老鼠</p>
+<p>无望又疯狂</p>
+<p>谁又或是什么事能带我离开这个讨人厌令人伤心的循环</p>
+<p>我希望那些想法不会再出现了</p>
+<p>我该做个正常的公民</p>
+<p>逃亡难道不又是一种失落循环吗</p>
+<h1 id="2017-01-17"><a href="#2017-01-17" class="headerlink" title="2017-01-17"></a>2017-01-17</h1><p>我不知道未来在哪里，我想得太多，导致自己十分苦恼，我就要离开家了，独自面对一切了，但是我不知道，我很茫然，我不明白到底怎么了，我野心勃勃，或是曾经野心勃勃，但现在我是什么？我算什么？无奈徒劳，失落，我陷入周期性的痛苦，焦灼，我早认识它了，对的，我的朋友，我的懦弱，我的野心，我的痛苦，我的焦灼，我早认识它了，我要在这一生中无止境地与它搏斗，一次一次，它站在现实那边，站在实际生活的那边，我们相互攻击，我只有理想，满脑子的理想，我拿什么打倒它？我靠什么去战斗？我害怕，我怕有一天我以自己理想的失败证明了它的胜利，我该到何处去诉说，没有人在乎，一遍一遍，总有事情教会我认清什么是现实，你该去哪儿去？承载着十几年的欢乐，被一个泡沫小船装着驶进了现实之海，我会被淹死，所有的欢乐都会变质，我要抵抗，我要拼，我要救我自己，我……</p>
+<h1 id="2017-02-19"><a href="#2017-02-19" class="headerlink" title="2017-02-19"></a>2017-02-19</h1><p>这是一件有意思的事，我认为高三的生活教会我最明显的一件事就是，三天之后，天翻地覆。我想三月份的到来不仅意味着体检和二诊。它更大的意义在于我快进入瓶颈期了。我的生活像个精神分裂的心理活动，就像早上看到奥斯卡颁奖仪式上，颁奖嘉宾说道：lalaland！</p>
+<p>我仿佛也是处于另一个世界，<strong>another land，lalaland？</strong></p>
+<p>可是下一秒就像是冥冥中注定了似的，卡了</p>
+<p>于是我就回归了我的dull生活</p>
+<p>我的头脑仿佛在变钝，我的生活只有发呆，睡觉吃饭睡觉，刷题。那么多人兴致勃勃地开始征途，野心家似地拼命。我在干什么？思考人生？我高二时说身处于高考复战状态下的教室里。我想找人交谈的愿望像个笑话。现在一年过去，我仍坐在这里，干嘛？干什么？为什么？是什么？什么支配着我，为什么束缚我。为什么 为什么 为什么，我的失落又来找我了，我无可避逃，我要任它撕咬，因为我还得考试我不能停止，我停不了，我不得不跑起来，但失落它咬着我的后脑勺，我感觉我做的一切都是徒劳</p>
+<h1 id="2020-01-09"><a href="#2020-01-09" class="headerlink" title="2020-01-09"></a>2020-01-09</h1><p>今天又把以前的东西翻出来看了<br>其实是很心惊的<br>不如说是，早在高二我就预料到了现在的状态<br>但同样的，同样的情绪问题一直都存在，从来没有变好过。自我感觉比以前好了不少其实是因为我转移注意力的频率更高了，加上情感隔离成习惯，我在解决自己的问题，以一种不算正确的方式。<br>结果就是我心理感受上变得舒服了，但是现实的处境并没有甚至更糟了。我在越来越糟糕的生活模式下压力其实越来越大，但情感隔离用得越来越熟练，渐渐地我所有情绪的阈值都被提高了。<br>焦虑不再能主导我的情绪，但是我的状态我的生活环境越来越差<br>我在平静地自杀，从生理和社会的两重意义下</p>
+<h1 id="2020-02-07"><a href="#2020-02-07" class="headerlink" title="2020-02-07"></a>2020-02-07</h1><p>失眠<br>翻来覆去一点想法<br>人<br>很多时候不能非常清楚地知道自己的路的拐点，所以类似《蝴蝶效应》中的情况是不存在的，微小的事物能做到的改变非常有限，更多时候，是许多微小的事物，慢慢改变了航向。人执着于拐点，其实有时候是必然的偶然，然后给这些必然的拐点赋予某种神圣意味，某种命运的不可言说<br>童年的因慢慢引导着结下现在的果实<br>而我的所有的路都在脚下，只是之前的经验决定了我的善恶，决定了我的气量和视野<br>我其实无能为力<br>骤然从成都回来也好，父亲给的那一巴掌也好，童年好友的离开也好，都算是某种拐点，拐点前后都是我的无能为力<br>我其实早就清楚我的问题所在，大概是，出于表演欲，出于维护一种虚假的体面，所以一直逃避</p>
+<h1 id="2020-06-09"><a href="#2020-06-09" class="headerlink" title="2020-06-09"></a>2020-06-09</h1><p>我没法集中我的精力<br>如果我所在的位置不是我满意的位置<br>或者说不是我觉得呆着很舒服的位置<br>下车的时候<br>我的心情就已经变得很差<br>我下车之后一个人走了<br>我爸爸跟在我的后面<br>我知道但我一句话都不想说<br>一个认识的人和其他人说<br>你看她一个人走了不管其他人<br>我听到了<br>但我已经走过去了<br>我心里的声音说关你屁事<br>我心情很差<br>因为我有种想要说脏话或者打什么东西的想法<br>我的胸口像是堵着什么东西<br>很闷很难受<br>要是我在没有走过去的时候听见这句话我一定会非常狠以我最狠的眼神死死盯住她<br>我不会考虑后果了<br>因为在那一刻我觉得没有什么严重的后果能够严重得过我当时的恶劣心情<br>到了爷爷奶奶家，我半是做作业，半是假装做作业来避免和其他人坐在一起<br>我不想理任何人，我看见其他人的眼神<br>感觉自己好像能够从他们的神情里面看到一直以来他们对我的评价一样：怪，内向<br>没有任何好转<br>天在下雨我在祈祷回家回到我自己的房间，但是他们没有想要离开的意思，我有一种冲动想要冲出去说一声现在可不可以回家了，但是我不敢，不是不敢而是，我这样肆意妄为之后，下一次，他们又会用什么表情什么态度来对待我<br>于是就这样吧，我继续假装做作业其实我完全没法集中注意力，我连打游戏都打得极端烦躁然后关掉了，我就坐在这里，像个平静的石头，没有表情，但是有一种悲怆的感觉在升起，愤怒是头脑一热，我想把所有东西弄坏，想把所有东西打乱，想让自己消失不见，这样我不用坐在这里无能为力地焦躁，我试着写些东西来收回我的注意力，但是不行，我喉咙发干，那种感觉伴随焦躁感一下又一下，我不知道我在想什么，唯一确定的是，每一次他们开心地发出声音，我就会更烦躁，我不是对他们有恶意，也可能有我没有意识到的恶意<br>他们在说离开了<br>我感觉我得到解放了</p>
+<p>现在我再回头看这段文字没有任何感觉了，就像一个干馒头一样干巴巴，没有任何感觉，真是奇怪，真是奇怪</p>
+<h1 id="2020-06-14"><a href="#2020-06-14" class="headerlink" title="2020-06-14"></a>2020-06-14</h1><p>很想吐，又是那种感觉，我觉得一旦我一头扎进自己的兴趣点，但是又不得不停留在现实生活中的时候，内心有种，像是撕开一块紧实的面团的那种，一边自己使出了吃奶的力气，一边感受到面团被缓慢拉扯的感觉。<br>所有的行为也好，感觉也好，一定会有某种合理的解释，我觉得找到这个解释才可以解决我目前的困境。或者说，也许这个解释并不能解决我目前的困境但是它可以满足我的好奇心，好奇心也是一种欲望，我在渴望被满足。<br>我非常清楚让自己保持愉悦的方法是不停地转移注意力，回避任何意义上会使我觉得难受的元素。但都是无意义的，我发现内核的原因在于我，不管如何回避，不能阻止内心升腾起来的无机质的恶心<br>与大多数人的交流不能使我快乐，因为我并没有将注意力放在他们身上，一旦我试图注视他们，我什么都感受不到，我像是一个虚拟机，所有的情感流必须从我的脑子里过一遍我才能感受到有内容<br>长期的目标，为之奋斗的理想于我而言无意义，我坚信所有的未来都是无意义的，聚集起来的人类和个体的人类没有什么分别，都是一样脆弱。我给一些人表露我的这种想法，他们第一反应是问我，那你为什么要活着？我不是非要活着，我也想要从来没有出现过。我活着了，我的状态已经是这样了。有时候我会有些戏谑的想法，人以相当大的代价换得了他们能感受到感官刺激的能力，被困在身体和整个世界以及心灵意义上的规则三重框架下<br>但我 什么都不想做，我只是在持续地固执地没什么其他意义地问着，为什么</p>
+<p>突然想起来，小时候无意摔坏了什么小动物的时候，最内核最内核的感受是没有感受，尽管我真的认为它们很可爱，我很喜欢，但是，我没有难过，我的不安来自于周围的人将如何对我的行为做出反应，有时候我觉得，是靠着我的母亲把我和这个世界联系起来，但是我本质是个混蛋</p>
+<h1 id="2020-10-19"><a href="#2020-10-19" class="headerlink" title="2020-10-19"></a>2020-10-19</h1><p>现在是2020.10.19.晚上十点刚喝完奶粉，吃完阿普。<br>没有什么想法或者说很多想法我不愿去细想，我常问自己，为什么到了这种田地。其实答案已经很明显，就像这样一篇一篇记录下来了。也有可能我想给自己的懒找一个借口，当我没动力去完成某件事情，我就可以推脱给抑郁，状态不对，然后心安理得地懒着。但是为什么会哭呢？当我想起亚伯欢迎我的模样，为什么会强烈地想哭？为什么接父亲的电话会想死？为什么开始听不懂别人说的话？为什么这么累？为什么凭什么我这么累？我好像没资格说累，然而绕不开，为什么活着？活着是为了是什么？这个问题如果得不到解答也只是车轱辘话又重新来一遍罢了。<br>I am sick</p>
+<h1 id="2020-11-19"><a href="#2020-11-19" class="headerlink" title="2020-11-19"></a>2020-11-19</h1><p>很奇怪的感觉<br>我不知道是不是因为梦太诡异<br>三次，或者换句话说三段<br>每一段我都在不停地省略关键步骤，像是滑行过躲避所有的概念输入，尽管我心里已有概念，我意识到危险或者说即将出现的恐惧的事物，全程保持着紧张与恐惧，但是现在我只能回想起部分情绪，梦境中使我恐惧的部分，被忘掉了，在梦中意识到曾有过的经验，梦中出现梦中以为熟悉的或是出现过的令我不安的剧情，我丧失了，挣扎出梦境的能力<br>最近的梦都有点儿，复古潮流的意味，像是很久没有出现的梦的类型，被人追赶，脱离重力的跳跃，还有一些，像是过去某段经历的复现，一些鲜明的情绪在梦中被发泄出来，愤怒与悲伤，愤怒是大脑中某个部分的存在突然变得明显，不是发热但是有热的感觉，不是疼痛但是有痛的感觉，就是，很明显，有什么地方在尖锐地提醒你，像是无声的嗡鸣，悲伤是，胸口什么都没有但是空气的存在又十分明显，大哭之后是吃过薄荷糖的空气，又空洞又凉<br>口红色号变化太蠢了，葛优，过年，清洁工，奇怪的诅咒？<br>但是从后脑勺传来的像是电流淌过的一阵一阵的感觉，谈不上舒服也没有不舒服，整个人像是躺在电子流沙上被包裹？<br>但不知道怎么<br>早上突然又意识到，我不能靠父母养着我，太自私了，我所希望的家里蹲的生活实际全靠妈妈一个人维持，那不是家里蹲，那是寄生虫，除非我可以，独立生活，才能选择自己想选择的生活方式，我不能，指望最后缩回家里当一只蛆，而且还是不能成为苍蝇的一只蛆，我必须工作以养活自己，独立安排各种生活琐事才有资格去谈我喜欢宅在家里的生活，否则，支撑我的家的美好愿景会永远被毁掉，那不是一个当我崩溃时可以寻求安慰的圣地，而是生活，生活是，难以忍受的。所以，必须保持距离，否则会毁掉最后的安慰，当我在这种生活中崩溃，将彻底失去锚点</p>
+<p>突然的哭泣不是悲伤，那就是一种突然的情绪，可能被任何事物引起，就像是看见别人的笑容会不自觉微笑，没有任何意义</p>
+<p>今早的假想愤怒：<br>大学老师应该学会和班上的怠学学生和谐共处，相互尊重，而不是我的地盘听我的，而学生对这句话的回应是，你有你的规则我有我的选择<br>放过我吧，那么谁他妈告诉我为什么我必须学这个傻逼英语</p>
+<p>难以忍受难以忍受难以忍受</p>
+<p>日常的想法有：为什么她们的头脑那么简单，见识那么浅那么薄，但是我却有点羡慕</p>
+<p>我是个神经病</p>
+<p>我累了</p>
+<h1 id="2021-04-16"><a href="#2021-04-16" class="headerlink" title="2021-04-16"></a>2021-04-16</h1><p>有时候就是这种生活，难以忍受，说不上一直在往下滑，想找一个安静，没有人认识我的地方，躺下来，焦虑，焦虑，焦虑，我有一种隐藏的焦虑，在我没有意识到的时候，能够感觉得到烦躁，我把他压下来，用指甲油按下去的胶状的粘质的东西按下去，把她摁在我的脑子上，然后往后推，我想吐出来的是什么？我想要吐出来的是什么？</p>
+<h1 id="2022-01-29"><a href="#2022-01-29" class="headerlink" title="2022-01-29"></a>2022-01-29</h1><p>今天是一月29日星期六<br>目前的工作走到了死胡同，我不知道该如何继续了，但是还是必须得继续这又导致另一个问题，我的注意力完全无法集中，我想要玩游戏，但是其实也没什么好玩的，很好笑，今晚有帮派联赛，虽然游戏怎么样似乎与现实生活无关，但是我对待每一个游戏都很认真，比对待我自己的生活认真。所以该怎样继续呢？<br><strong>似乎走到了死胡同的我与我的生活</strong></p>
+<h1 id="2022-01-30"><a href="#2022-01-30" class="headerlink" title="2022-01-30"></a>2022-01-30</h1><p>今天是 一月30日星期天<br>这是我第三次，不应该是第四次梦见末日，虽然梦里是惶恐的，但每次醒来又觉得遗憾，我应该改那一把刀子，为什么是剪刀呢，克莱因蓝色的刀把，我在与谁打架，剪我的喉咙，奇怪的光影我觉得难受</p>
+
+ </div>
+   <section class="post-tags">
+     <div>
+       <span class="tag">
+         
+           
+             <a href="../tags/%E6%AD%BB/"><i class="iconfont icon-tag"></i>&nbsp;&nbsp;死&nbsp;&nbsp;</a>
+           
+             <a href="../tags/%E7%97%85/"><i class="iconfont icon-tag"></i>&nbsp;&nbsp;病&nbsp;&nbsp;</a>
+           
+             <a href="../tags/%E6%80%9D/"><i class="iconfont icon-tag"></i>&nbsp;&nbsp;思&nbsp;&nbsp;</a>
+           
+         
+       </span>
+     </div>
+     <div>
+       <a href="javascript:window.history.back();">back</a>
+       <span>· </span>
+       <a href="/">home</a>
+     </div>
+   </section>
+   <section class="post-nav">
+     
+       <a class="prev" rel="prev" href="70a2a5c9.html">the Past is never Dead</a>
+       
+     
+       <a class="next" rel="next" href="6004ba21.html">玻璃盒子</a>
+       
+    </section>
+    
+      <section class="post-copyright">
+        
+          <div class="copyright-item">
+            <span>Sinnerla</span>
+          </div>
+          
+        
+        
+        
+          <span>辛拉没有麺，真的没有</span>
+          
+        </section>
+        
+</article>
+
+</div>
+
+
+ <div id="gitalk-container"></div>
+ <!-- Gitalk支持 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+ var gitalk = new Gitalk({
+ clientID: '1ef6686ae0caacdc40c6',
+ clientSecret: '4ba0ba87d81338047baa13bc94f52adac3555323',
+ repo: 'Gitalk_Date',
+ owner: 'Sinnerla',
+ admin: 'Sinnerla',
+ id: location.pathname,
+ labels: 'Gitalk'.split(',').filter(l => l),
+ perPage: 10,
+ pagerDirection: 'last',
+ createIssueManually: true,
+ distractionFreeMode: true
+ })
+ gitalk.render('gitalk-container')
+</script>
+
+
+
+            </div>
+            <!--页脚-->
+<link rel="stylesheet" href="../fonts/iconfont/iconfont.css">
+<footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 美丽的Sinnerla | Powered by
+          <a href="https://hexo.io" target="_blank">Hexo</a> &
+          <a href="https://github.com/Sinnerla/Sinnerla.github.io" target="_blank"><i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> S'blog <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i></a>
+        </span>
+    </div>
+</footer>
+
+    </div>
+    <!-- 搜索功能 -->
+    <div id="u-search">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="container">
+                    <form id="u-search-modal-form" class="u-search-modal-form">
+                        <button type="submit" class="form-submit-btn">
+                            <img src="../image/find.png" class="search-btn-img" />
+                        </button>
+                        <input placeholder="Find?" class="form-input" id="modal-form-input">
+                    </form>
+                    <a class="modal-close">x</a>
+                </div>
+                <div class="search-loading">
+                    <div class="search-loading-bar"></div>
+                </div>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+        <div class="modal-overlay"></div>
+    </div>
+</body>
+</html>

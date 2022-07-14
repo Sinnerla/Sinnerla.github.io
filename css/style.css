@@ -84,7 +84,7 @@
     height: 64px;
     top: 0;
     right: 0;
-    color: #ea9999;
+    color: #d9d9d9;
     cursor: pointer;
     text-align: center;
     line-height: 64px;
@@ -786,13 +786,19 @@ header label {
   overflow: hidden;
 }
 .tag-cloud-tags {
-  margin: 10px 0;
-  padding-top: 2em;
+  display: flex;
+  margin: 5px 0;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: row;
+  margin-right: calc(80% / 5);
+  flex-wrap: wrap;
+  padding-top: 5em;
 }
 .tag-cloud-tags a {
   display: inline-block;
   position: relative;
-  margin: 5px 10px;
+  margin: 10px 10px;
   word-wrap: break-word;
   transition-duration: 0.3s;
   transition-property: transform;
@@ -805,7 +811,7 @@ header label {
   transform: scale(1.1);
 }
 .tag-cloud-tags a small {
-  margin: 0 0.3em;
+  margin: 0 1.8em;
   color: #a9a9b3;
 }
 .page {
@@ -1413,14 +1419,13 @@ header label {
   flex-wrap: nowrap;
   align-items: center;
 }
-.img-list,
-.img-column {
-  display: flex;
-  flex-direction: column-reverse;
-}
-.img-column a,
 .album-item {
   margin-top: 100px;
+}
+.album-item img {
+  border-radius: 20px 20px;
+  box-shadow: 1;
+  box-shadow: 8px 10px 5px #d9d9d9;
 }
 .album-item p {
   margin: 10px auto 10px;
@@ -1432,9 +1437,18 @@ header label {
   border-radius: 7px;
   border: 1px solid $black-deep;
 }
+.album-item :hover {
+  position: relative;
+  -webkit-transform: translateY(-0.2em);
+  -moz-transform: translateY(-0.2em);
+  -ms-transform: translateY(-0.2em);
+  -o-transform: translateY(-0.2em);
+  transform: translateY(-0.2em);
+  cursor: pointer;
+}
 .posts-expand .post-body .gallery-album a img {
   height: 250px;
-  width: 300px;
+  width: 250spx;
   object-fit: contain;
 }
 @media (max-width: 767px) {

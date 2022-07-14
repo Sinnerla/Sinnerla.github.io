@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="default">
+
+<head>
+    <!-- 网页头部 -->
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+
+    <link rel="icon" href="../favicon.ico">
+
+
+    <meta name="author" content="Sinnerla">
+
+
+    <meta name="subtitle" content="Whatever">
+
+
+    <meta name="description" content="blog of sinnerla">
+
+
+
+<title>the Past is never Dead | S&#39;Blog</title>
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="../css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="../js/script.js"></script>
+    
+    <script src="../js/tocbot.min.js"></script>
+    
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    
+
+
+
+    <script>
+    function searchToggle() {
+        const width = $(document.body).width()
+        if(width > 479) {
+            return;
+        }
+        const search = $('.search');
+        const searchForm = $('.form-search');
+        const menuToggle = $('.menu-toggle');
+        const title = $('.navbar-header-title ');
+
+        if(!search.hasClass("mobile-search")) {
+            search.addClass("mobile-search");
+            menuToggle.addClass("open-search")
+            title.addClass("mobile-title-hidden")
+        } else {
+            search.removeClass("mobile-search");
+            menuToggle.removeClass("open-search")
+            // title.css({visibility: 'visible'})
+            title.removeClass("mobile-title-hidden")
+        }
+    }
+    function search(searchInputEl, formEl, flag) {
+        const path = "/" + "search.json"; // 可以在public 下查看这个search.json
+        $(formEl).submit(function(e){
+            e.preventDefault();
+            let target = null
+            if(searchInputEl == null) {
+                const screenWidth = $(document.body).width();
+                target = screenWidth > 479 ? $('#pc-search-input') : $('#mobile-search-input');
+                console.log(target);
+            } else {
+                target = $(searchInputEl)
+            }
+
+            if(!flag && target.val() === '') {
+                return ;
+            }
+
+            $("#u-search").fadeIn(500, function() {
+                $("body > .wrapper").addClass("modal-active");
+
+                $.ajax({
+                    url: path,
+                    dataType: "json",
+                    beforeSend: function (xhr) {
+                        $input = target.val();
+                        $(".form-input").val($input);
+                        const loadingBar = $('.search-loading-bar')
+                        loadingBar.css({
+                            width:'100%',
+                            display: 'block'
+                        });
+                    },
+                    success: function( datas ) {
+                        console.log(datas);
+                        const $resultPanel = $(".modal-body")[0];
+                        let str = `<ul class="modal-results">`;
+                        var keywords = $(".form-input").val().trim().toLowerCase().split(/[\s\-]+/);
+                        $resultPanel.innerHTML = "";
+                        let hasResult = false
+                        let text = `<div class="no-result">啊哦....</div>`;
+
+                        if ($(".form-input").val().trim().length <= 0) {
+                            // 没有结果
+                            $resultPanel.innerHTML = text;
+                            return;
+                        }
+                        datas.forEach(function (data, index) {
+                            var isMatch = true;
+                            if (!data.title || data.title.trim() === '') {
+                                data.title = "Untitled";
+                            }
+                            var data_title = data.title.trim().toLowerCase();
+                            var data_content = data.content && data.content.trim().replace(/<[^>]+>/g, "").toLowerCase() || '';
+                            var data_url = data.url;
+                            var index_title = -1;
+                            var index_content = -1;
+                            var first_occur = -1;
+                            // only match artiles with not empty contents
+                            if (data_content !== '') {
+                                keywords.forEach(function (keyword, i) {
+                                    index_title = data_title.indexOf(keyword);
+                                    index_content = data_content.indexOf(keyword);
+
+                                    if (index_title < 0 && index_content < 0) {
+                                        isMatch = false;
+                                    } else {
+                                        hasResult = true
+                                        if (index_content < 0) {
+                                            index_content = 0;
+                                        }
+                                        if (i == 0) {
+                                            first_occur = index_content;
+                                        }
+                                    }
+                                });
+                            } else {
+                                isMatch = false;
+                            }
+                            // show search results
+                            if (isMatch) {
+                                str += `<li class='result-item'><a href='${data_url}' class='result-item-detail'> <span class="title">${data_title}</span>`;
+                                var content = data.content.trim().replace(/<[^>]+>/g, "");
+                                if (first_occur >= 0) {
+                                    // cut out 200 characters
+                                    var start = first_occur - 40;
+                                    var end = first_occur + 160;
+
+                                    if (start < 0) {
+                                        start = 0;
+                                    }
+
+                                    if (start == 0) {
+                                        end = 200;
+                                    }
+
+                                    if (end > content.length) {
+                                        end = content.length;
+                                    }
+
+                                    var match_content = content.substring(start, end);
+
+                                    // highlight all keywords
+                                    keywords.forEach(function (keyword) {
+                                        var regS = new RegExp(keyword, "gi");
+                                        match_content = match_content.replace(regS, `<em class="search-keyword">${keyword}</em>`);
+                                    });
+
+                                    str += `<span class="content"> ${match_content} ...</span></a>`;
+                                }
+                                str += "</li>";
+                            }
+                        });
+                        str += "</ul>";
+                        if(hasResult) {
+                            $resultPanel.innerHTML = str;
+                        } else {
+                            $resultPanel.innerHTML = text;
+                        }
+
+                    },
+                    complete: function() {
+                        setTimeout(() => {
+                                const loadingBar = $('.search-loading-bar')
+                                loadingBar.css({
+                                    width:'0%',
+                                    display: 'none'
+                                });
+                        }, 300)
+                    }
+                });
+            })
+
+        });
+    }
+
+    $(document).ready(function() {
+        $('.modal-close').click(function () {
+            $("#u-search").fadeOut();
+            $("body > .wrapper").removeClass("modal-active")
+        })
+
+        $('.modal-overlay').click(function() {
+            $("#u-search").fadeOut();
+            $("body > .wrapper").removeClass("modal-active")
+        })
+        search(null, ".form-search", false)
+        search("#u-search-modal-form .form-input", ".u-search-modal-form", true)
+    })
+</script>
+
+
+
+<meta name="generator" content="Hexo 6.0.0"><link rel="alternate" href="atom.xml" title="S'Blog" type="application/atom+xml">
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- 头部菜单 -->
+<header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">S&#39; Blog</a></div>
+            <div class="menu navbar-right">
+              <!-- 这里表示的是pc端搜索框 -->
+            
+            <!-- 搜索框 -->
+
+    <div class="search ">
+        <form class="form-search">
+            <input class="input" placeholder="Search！" autocomplete="off" id="pc-search-input"/>
+        </form>
+        <div class="search-btn" onClick="searchToggle()">
+            <img src="../image/search.png" class="search-btn-img" />
+        </div>
+    </div>
+
+
+            
+            <a class="menu-item" href="../archives">Posts</a>
+            
+            <a class="menu-item" href="../category">Categories</a>
+            
+            <a class="menu-item" href="../gallery">Gallery</a>
+            
+        </div>
+    </div>
+</nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">S&#39; Blog</a>
+                </div>
+                <!-- 这里表示的是移动端搜索框 -->
+                <div class="navbar-mobile-right">
+               <div class="menu-toggle" onclick="mobileBtn()">&#9776; 目录</div>
+               </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="../archives">Posts</a>
+                
+                    <a class="menu-item" href="../category">Categories</a>
+                
+                    <a class="menu-item" href="../gallery">Gallery</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+
+            <div class="main">
+                
+<!-- 文章正文（Post）页 -->
+<link rel="stylesheet" href="../fonts/iconfont/iconfont.css">
+<div class="container">
+
+
+  <!-- 文章正文侧边栏 -->
+<div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+</script>
+
+  
+
+<article class="post-wrap">
+  <header class="post-header">
+    <h1 class="post-title">the Past is never Dead</h1><br/>
+    
+      <div class="post-meta">
+        
+          Author &nbsp;&nbsp;&nbsp: &nbsp;&nbsp;&nbsp  <a itemprop="author" rel="author" href="/">Sinnerla</a>
+          <br/>
+          
+            <span class="post-time">
+              Date &nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp: &nbsp;&nbsp;&nbsp <a href="#">28 June, 2022</a>
+            </span>
+            <br/>
+            
+              <span class="post-category">
+                Category : &nbsp;&nbsp;&nbsp
+                
+                  <a href="../categories/%E5%91%93%E8%AF%AD/">呓语</a>
+                  
+                </span>
+                
+              </div>
+              
+            </header>
+ <div class="post-content">
+   <h1 id="the-Past-is-never-Dead，"><a href="#the-Past-is-never-Dead，" class="headerlink" title="the Past is never Dead，"></a>the Past is never Dead，</h1><p>2020年9月，我第一次走进精神科，实在没想到未来将近两年都会一直吃药，而且还要吃很久很久到一个虚无缥缈的尽头<br>两年时间，我对于药物治疗从绝望地尝试，期待，到失望透顶，再到平静接纳，直至变成我生活的一部分<br>我已经忘记自己作为正常，健康的人的生活体验<br>我逆流而上，溯源到很小很小的时候，小到还不够年龄在小小班托管<br>我非常确定自己是高敏感体质，我的父母也是，高敏感的各位一定能理解，光线，声音，气味，触感，温度湿度的变化，于我而言都会非常明显甚至于直接影响情绪，而情绪，除非经过刻意练习很难控制，因为它即刻出现又转瞬即逝<br>我想没有高敏感体制的人能在小的时候就能和这个世界和平相处，对于顿感人群来说一个极细微甚至都不会察觉到的事件都会强烈且深刻地影响我。我的无忧无虑的童年可能在我童年还没开始的时候就已经结束了。长辈的大声呵斥会让我恐惧，哪怕并无呵斥的想法一旦对方音量提高，我都会觉得心悸，直到现在我依然不喜欢别人大声说话。<br>但是高敏感不代表一定会被这些事情影响，如果成长的环境适宜，高敏感也是可以一边感受这个多彩世界一边以正向的方式成长的。不知道大家有没有看过B站的一个视频，叫做‘给你一颗勇气糖’，我看完流泪了，因为这种温柔地，细微地，徐徐地让高敏感的小孩接受社会化的方式很让人动容。但懂得这样做的家长或者长辈必须也是高敏感，已经和这个世界磨合得不错的坚定的人。一旦高敏感的孩子感觉到对方的动摇，只是复刻这种教育方法也并不能奏效，这样的长辈太少了，凤毛麟角，也许足够幸运会在很小的时候就遇到，但我想大多数人都没有中彩票的勇气<br>所以高敏感的小孩被这个世界折磨着慢慢长大逐渐接受。</p>
+<h1 id="it-is-not-even-past"><a href="#it-is-not-even-past" class="headerlink" title="it is not even past"></a>it is not even past</h1><p>我的父母，是走向完全不同道路的高敏感成年人。<br>我的母亲出生在及其重男轻女的父亲和沉默地依附着父亲的母亲组成的家庭，她小时候，会被放任自生自灭，被无声缓慢地谋杀，然而她幸运有一位在那个社会及其罕见的疼爱孙女的奶奶。但在我看来，这也是她的不幸，她活下来了，却没有失去感恩一切的心，即使辍学打工也一直对家庭倾尽所有。我对她的纯粹的善良经历过不解困惑恨其不争慢慢理解的过程，只有一件事是一直确定的，我尊重且钦佩她的善良。她没有选择和这个世界决裂，而是慢慢地去适应，变成一个很像是钝感人的人。<br>我的父亲拥有一位阿斯伯格综合征的父亲以及一位柔弱的受气包母亲。可以想见这样的家庭中高敏感孩子的成长历程，我的父亲没有得到他父亲的爱与尊重，在家中兄弟姐妹也不理解他的敏感。从前社会对敏感的男孩更加不友好，被嘲笑被揶揄被训斥，他选择和小时候的我一样开始逐渐防御、冷漠、抑制共情能力，直到成年直到结婚直到我出生直到我也被搅拌着长大。<br>强势能干在社会里摸滚打爬长大的母亲与沉默着在象牙塔读到大学毕业的父亲，怎么看都不像是会一起组建家庭的人。我爸自我感动地陷入恋爱，却没有爱人的能力甚至不屑于模仿，我妈虽然情感丰富，但从社会习惯与实用主义出发，与我爸达成了双向奔赴，从此与我爸以及我爸的重男轻女家庭绑定在了一起。<br>普通人的悲剧总是绝望地在家族传递下轮回。</p>
+<h1 id="What-do-I-Remember"><a href="#What-do-I-Remember" class="headerlink" title="What do I Remember?"></a>What do I Remember?</h1><p>我在成都长到三岁，之后随父母回到老家的小县城。川渝地区的人知道不同地区的方言的惯用词和口音都会有或大或小的差异。长辈们不带恶意地打趣我的然后大家一起哄堂大笑只会让我惶恐，太小的孩子不能理解他们为什么笑，只是明显感觉到很不舒服，没有更好的方式去抵御强烈的内心冲突，于是我慢慢把情感隔离刻进我的DNA，成为像情绪一样无法控制的反应，因为我必须靠它去缓解情绪带给我的伤害。但我不再敢自信地开口说话，这是第一个拐点<br>我在重男轻女的家族氛围中长大，在兴趣班男老师的隐秘的性骚扰下，变得极度内向害羞而狠绝，小学三年级我就知道去兴趣班要揣上弹簧刀，进门前每一次都做最坏的打算，同样也是三年级，我在家庭聚会上直接拒绝长辈的关于家里是否生二胎的试探并且表示如果生下来，我目前还没到承担刑事责任的年龄。我非常感谢我的妈妈坚定地与我站在一起，大概是因为她和我都深深地意识到第二个孩子的出生无论怎样都会对我产生巨大的伤害，<br>二年级我已经产生，想要消失掉，想要不存在于这个世界上的念头，这念头若有若无地穿插在我整个小学时代，但我还是班级里最害羞的那个女生，害羞但是普通。上初中后我决心变得不普通，开始笨拙地社交，假装友好且爽朗，大概因为太笨拙了，所以显得奇怪。突然有一天，班主任找到我，说有同学向他反映我这个人很古怪，不好相处。我没预料到我费尽心机地讨好这个世界却得到这个评价，这是第二个拐点。<br>很感谢我的初中班主任，他是极其少见的平等对待且尊重学生的好老师，在这种尊重和维护下，我向着异类的方向疾驰而去。青春期的初中，中二病的初中，最烦燥的初中，我平等地恨着所有人，包括我自己，想要消失的念头出现得越来越频繁，我注意到我情绪的周期性低落，并且十分确定不是月经周期，当我有一天终于自残的时候，我意识到自己可能是抑郁症。<br>我开始看心理学方面的书，看得越多我越肯定，但是那个时候不存在精神疾病，所有的烦恼都是性格问题，哪怕我很清楚自己的情况但没法说出不存在的病症，我开始自我调节。我好像有种解构一切的天赋，我分析自己，回忆过去，弄清所有脉络，这种反复高强度地分析自己，却发现源头不是自己，让我变得愤世嫉俗，我不能原谅，不能原谅每一个曾无意伤害到我的人，不能原谅我自己的平庸虚荣脆弱，不能原谅自己感觉到被伤害，到达自我厌恶的顶点，想以某种方式死去，然而那时候能想到的每一种方法都太过激烈。年级升高，学业慢慢分走我专注于自己的精力<br>接着不知道为什么，也不清楚什么时候开始，我社交活动渐多，越来越无所畏惧，脸皮越来越厚，熟悉的朋友圈子，在我升同所中学的高中后，及其快乐疯狂的轻躁狂伴轻度抑郁的循环开始了，我却觉得是自己性格变得开朗了，至于循环的抑郁，初中三年我已经学会怎么去和它相处了。<br>高中时期做了很多现在想起来脚趾抠地的事情。但是我很快乐，学习有动力，社交有精力，初中我专注于解构第一人称视角，而高中我解构第二人称第三人称的视角，所有的事物都变得多彩而支离破碎。这个时期太长了，长到我真的以为那就是自己的性格。我感觉我理解了全世界，我肯定了酒肉朋友的价值，初中我厌弃这种浮夸的友谊，高中我却从中真切地感受到了快乐，我爱全人类除了10岁以下的孩子，我跑步上下学，瘦了十多斤，打一体育课的羽毛球。这个阶段我不再努力开导自己，抑郁出现的时候我就看书，选择直接转移注意力。这个时期，轻躁狂发作时我愉快地疯狂地体验一切缤纷，但我不知道该如何处理抑郁时所有缤纷黯淡后的一片虚无，我觉得因为我书读得太少，所以我不配讲出我深深地觉得一切都没有意义这样的话。这个时期我开始喝酒，我喜欢微醺时轻飘飘而且脑袋空空的感觉，放空且愉悦<br>整个高三我都绷得很紧，我的脑子还是有空思考当时特朗普当选美国总统，做出一系列动作，在家里看完新闻，一直在想着未来，高三，也许是最不确定自己未来的时候<br>我感觉到一种深深的恐惧，我发现自己也许并没有出生在一个好的时代，一种隐秘的歇斯底里在慢慢侵袭，我对小丑的那句:疯狂就像地心引力，你要做的就是轻轻一推，耿耿于怀，因为我感觉整个世界已经被推动了，外面的世界飞速地变化，我害怕这种变化。高考完所有的压力都消失了，但我害怕，我回避着去进行大学的规划，这个时候我已经不能像以前一样比较完美解决自己的心理问题了<br>我摆烂地让妈妈帮我填了志愿，摆烂地让她代替我去社交，从此我进入了一眼望不到边的抑郁期<br>进入完全陌生的环境，适应完全不同的生活方式，日常生活我适应得很好，我把自己照顾得很好，但是我觉得孤单，我又不想要浮夸的快乐了，想要深度的社交，我花钱如流水但我开始感觉疲备。等到我终于和室友们建立了非常坚固的革命友情，满足了深度社交的欲望，我发现我不喜欢自己的专业，越读，越力不从心。我曾经以为大学生活是一种圆满，但我感觉自己好像被一种力量牵着不停往前，我开始做心理咨询，然后发现没有帮助，没有一个咨询师能解开我从幼儿园开始的乱麻，每换一个一个咨询师我都会将以上的所有再讲一遍，虚无感一寸一寸侵蚀着我，我曾经旺盛的表达欲降到谷底，我感觉我的生活和所有的想法都像我一次又一次重复给不同咨询师讲一样的内容一样车轱辘<br>我几乎没怎么犹豫就降级转到了自己喜欢的专业，因为我已经不在乎了，我依然和室友们以前的同级们住在一起，维持着亲密的社交，我很满足。然而转专业之后的所有琐事都在消耗我，我奋力维持平衡，累到麻木，开始偶尔出现解离症状，我感觉自己干瘪而枯燥，内里空空的，讲话变得干涩而艰难，脑子和感觉都越来越钝，这时候我就应该去医院，但我懒得打破维持的平衡，平静得像一块木板<br>我开始大量饮酒，做各种能让自己短暂高兴的事情，这个阶段已经在滑向崩溃，我甚至在家族聚会上喝到断片，和比我更严重的双相的姐姐抱头痛哭四小时，一件一件比对小时候受过的伤害，那些曾经让我恨过的长辈，为当初他们可能现在已经记不得的事道歉，我悲哀地发现他们很真诚。第二天酒醒之后，我看着天花板只觉得很茫然，一切都没有意义，我甚至不能怪他们因为我真的完全理解他们，他们的想法，他们的行为。在我的脑子里有着清晰的模型，所以我知道，他们确实没有恶意，他们只是，普通人，正常的人，复杂的人。<br>当疫情后回到熟悉的学校，因为学校重新规划校区，我们专业搬到了新校区，离开那个我熟悉的舒适的寝室搬到完全陌生的校区陌生的寝室，逻辑清晰地脉络分明地终于崩溃<br>我终于无法自己消化一切，只能求助，从抑郁症出发，开始了试药之旅，我以为开始了治疗，就会好起来，不然怎么能是我最后的稻草。但是情况却时好时坏，状态越来越差，终于差到学校的药已经不能满足治疗方案了，转诊。<br>当时我的状态已经差到临界点，转诊的医院却只能坐公交到达，我晕车，半睡半醒地坐到了终点站，又坐上返程的车，在车上听着公交车上女生播报巨大的声音，越来越荒芜的窗外</p>
+
+ </div>
+   <section class="post-tags">
+     <div>
+       <span class="tag">
+         
+           
+             <a href="../tags/%E7%97%85/"><i class="iconfont icon-tag"></i>&nbsp;&nbsp;病&nbsp;&nbsp;</a>
+           
+         
+       </span>
+     </div>
+     <div>
+       <a href="javascript:window.history.back();">back</a>
+       <span>· </span>
+       <a href="/">home</a>
+     </div>
+   </section>
+   <section class="post-nav">
+     
+     
+       <a class="next" rel="next" href="6e942684.html">自深深处</a>
+       
+    </section>
+    
+      <section class="post-copyright">
+        
+          <div class="copyright-item">
+            <span>Sinnerla</span>
+          </div>
+          
+        
+        
+        
+          <span>辛拉没有麺，真的没有</span>
+          
+        </section>
+        
+</article>
+
+</div>
+
+
+ <div id="gitalk-container"></div>
+ <!-- Gitalk支持 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css">
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js"></script>
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+ var gitalk = new Gitalk({
+ clientID: '1ef6686ae0caacdc40c6',
+ clientSecret: '4ba0ba87d81338047baa13bc94f52adac3555323',
+ repo: 'Gitalk_Date',
+ owner: 'Sinnerla',
+ admin: 'Sinnerla',
+ id: location.pathname,
+ labels: 'Gitalk'.split(',').filter(l => l),
+ perPage: 10,
+ pagerDirection: 'last',
+ createIssueManually: true,
+ distractionFreeMode: true
+ })
+ gitalk.render('gitalk-container')
+</script>
+
+
+
+            </div>
+            <!--页脚-->
+<link rel="stylesheet" href="../fonts/iconfont/iconfont.css">
+<footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 美丽的Sinnerla | Powered by
+          <a href="https://hexo.io" target="_blank">Hexo</a> &
+          <a href="https://github.com/Sinnerla/Sinnerla.github.io" target="_blank"><i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> S'blog <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i> <i class="iconfont icon-heart"></i></a>
+        </span>
+    </div>
+</footer>
+
+    </div>
+    <!-- 搜索功能 -->
+    <div id="u-search">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="container">
+                    <form id="u-search-modal-form" class="u-search-modal-form">
+                        <button type="submit" class="form-submit-btn">
+                            <img src="../image/find.png" class="search-btn-img" />
+                        </button>
+                        <input placeholder="Find?" class="form-input" id="modal-form-input">
+                    </form>
+                    <a class="modal-close">x</a>
+                </div>
+                <div class="search-loading">
+                    <div class="search-loading-bar"></div>
+                </div>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+        <div class="modal-overlay"></div>
+    </div>
+</body>
+</html>
