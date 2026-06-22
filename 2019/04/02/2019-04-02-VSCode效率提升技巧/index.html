@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hexo 8.1.2">
+  <title>VSCode 效率提升：让编码速度翻倍的技巧 - 金兔丁农场</title>
+  <meta name="description" content="快捷键掌握熟记快捷键是提升编码效率最直接的方式。 编辑类快捷键 Ctrl+D — 选中下一个相同单词 Ctrl+Shift+L — 选中所有相同单词 Alt+↑&#x2F;↓ — 移动当前行 Shift+Alt+↑&#x2F;↓ — 复制当前行  导航类快捷键 Ctrl+P — 快速打开文件 Ctrl+Shift+P — 命令面板 Ctrl+&#96; — 打开终端  必备插件推荐好的插件让 VS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="VSCode 效率提升：让编码速度翻倍的技巧">
+<meta property="og:url" content="http://example.com/2019/04/02/2019-04-02-VSCode%E6%95%88%E7%8E%87%E6%8F%90%E5%8D%87%E6%8A%80%E5%B7%A7/index.html">
+<meta property="og:site_name" content="金兔丁农场">
+<meta property="og:description" content="快捷键掌握熟记快捷键是提升编码效率最直接的方式。 编辑类快捷键 Ctrl+D — 选中下一个相同单词 Ctrl+Shift+L — 选中所有相同单词 Alt+↑&#x2F;↓ — 移动当前行 Shift+Alt+↑&#x2F;↓ — 复制当前行  导航类快捷键 Ctrl+P — 快速打开文件 Ctrl+Shift+P — 命令面板 Ctrl+&#96; — 打开终端  必备插件推荐好的插件让 VS">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-04-01T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-19T20:14:23.739Z">
+<meta property="article:author" content="兔丁老大">
+<meta property="article:tag" content="VSCode   - 效率   - 编辑器">
+<meta name="twitter:card" content="summary">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-default.min.css">
+  
+  <link rel="icon" href="/galleries/icon/avatar.jpg">
+  
+  <script>
+    (function () {
+      var stored = localStorage.getItem('pure-theme-dark-mode');
+      var mode = stored || 'auto';
+      if (mode === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      } else if (mode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+  
+  
+
+</head>
+<body>
+  
+<div class="dark-mode-toggle" id="darkModeToggle" title="Toggle dark mode">
+  <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="5" fill="currentColor"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2"/></svg>
+  <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor"/></svg>
+</div>
+
+
+  <div class="site-wrapper">
+
+<header class="site-header">
+  <div class="header-inner">
+    
+    <a href="/" class="header-home-link">金兔丁农场</a>
+    
+    <div class="header-right">
+      <div class="header-search">
+        <span class="search-icon">
+          <svg viewBox="0 0 24 24" width="16" height="16"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/></svg>
+        </span>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search" autocomplete="off">
+        <div class="search-dropdown" id="searchDropdown"></div>
+      </div>
+      <nav class="header-nav">
+        
+          
+            <a href="/posts">Posts</a>
+          
+            <a href="/categories">Categories</a>
+          
+            <a href="/galleries">Gallery</a>
+          
+        
+      </nav>
+    </div>
+    <button class="mobile-nav-toggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-nav-panel">
+    <nav class="mobile-nav">
+      
+      <a href="/">金兔丁农场</a>
+      
+      
+        
+          <a href="/posts">Posts</a>
+        
+          <a href="/categories">Categories</a>
+        
+          <a href="/galleries">Gallery</a>
+        
+      
+    </nav>
+  </div>
+</header>
+
+<main class="site-main">
+  <article class="post-article">
+  <div class="container">
+    <header class="post-header">
+      <h1 class="post-title">VSCode 效率提升：让编码速度翻倍的技巧</h1>
+      <div class="post-meta">
+        <time datetime="2019-04-02">2019-04-02</time>
+        
+        <span class="post-categories">
+          
+          <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/">技术分享</a>
+          
+        </span>
+        
+        
+        <span class="post-tags">
+          
+          <a href="/tags/VSCode-%E6%95%88%E7%8E%87-%E7%BC%96%E8%BE%91%E5%99%A8/">#VSCode   - 效率   - 编辑器</a>
+          
+        </span>
+        
+      </div>
+    </header>
+
+    <div class="post-body-wrapper">
+      <div class="post-content">
+        <h2 id="快捷键掌握"><a href="#快捷键掌握" class="headerlink" title="快捷键掌握"></a>快捷键掌握</h2><p>熟记快捷键是提升编码效率最直接的方式。</p>
+<h3 id="编辑类快捷键"><a href="#编辑类快捷键" class="headerlink" title="编辑类快捷键"></a>编辑类快捷键</h3><ul>
+<li>Ctrl+D — 选中下一个相同单词</li>
+<li>Ctrl+Shift+L — 选中所有相同单词</li>
+<li>Alt+↑&#x2F;↓ — 移动当前行</li>
+<li>Shift+Alt+↑&#x2F;↓ — 复制当前行</li>
+</ul>
+<h3 id="导航类快捷键"><a href="#导航类快捷键" class="headerlink" title="导航类快捷键"></a>导航类快捷键</h3><ul>
+<li>Ctrl+P — 快速打开文件</li>
+<li>Ctrl+Shift+P — 命令面板</li>
+<li>Ctrl+&#96; — 打开终端</li>
+</ul>
+<h2 id="必备插件推荐"><a href="#必备插件推荐" class="headerlink" title="必备插件推荐"></a>必备插件推荐</h2><p>好的插件让 VSCode 如虎添翼。</p>
+<h3 id="GitLens"><a href="#GitLens" class="headerlink" title="GitLens"></a>GitLens</h3><p>增强 Git 功能，显示行级别的 blame 信息和提交历史。</p>
+<h3 id="Prettier"><a href="#Prettier" class="headerlink" title="Prettier"></a>Prettier</h3><p>自动格式化代码，保持团队风格一致。</p>
+<p><code>json {   &quot;editor.formatOnSave&quot;: true,   &quot;editor.defaultFormatter&quot;: &quot;esbenp.prettier-vscode&quot; } </code></p>
+<h2 id="自定义-Snippets"><a href="#自定义-Snippets" class="headerlink" title="自定义 Snippets"></a>自定义 Snippets</h2><p>重复的代码片段应该交给 Snippets 处理。</p>
+<h3 id="创建自定义-Snippet"><a href="#创建自定义-Snippet" class="headerlink" title="创建自定义 Snippet"></a>创建自定义 Snippet</h3><p>在 File &gt; Preferences &gt; User Snippets 中配置。</p>
+<blockquote>
+<p>好的 Snippet 应该包含常用的占位符和 Tab 停止点。</p>
+</blockquote>
+
+      </div>
+      <aside class="post-toc" id="postToc">
+        <div class="toc-title">目录</div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BF%AB%E6%8D%B7%E9%94%AE%E6%8E%8C%E6%8F%A1"><span class="toc-text">快捷键掌握</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%96%E8%BE%91%E7%B1%BB%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="toc-text">编辑类快捷键</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%BC%E8%88%AA%E7%B1%BB%E5%BF%AB%E6%8D%B7%E9%94%AE"><span class="toc-text">导航类快捷键</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BF%85%E5%A4%87%E6%8F%92%E4%BB%B6%E6%8E%A8%E8%8D%90"><span class="toc-text">必备插件推荐</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#GitLens"><span class="toc-text">GitLens</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Prettier"><span class="toc-text">Prettier</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89-Snippets"><span class="toc-text">自定义 Snippets</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E8%87%AA%E5%AE%9A%E4%B9%89-Snippet"><span class="toc-text">创建自定义 Snippet</span></a></li></ol></li></ol>
+      </aside>
+    </div>
+
+    
+  </div>
+</article>
+
+</main>
+  </div><!-- .site-wrapper -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p>&copy; 2024 - 2026 Your Name. All Rights Reserved.</p>
+      <p class="footer-powered">由 <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; Pure Theme</p>
+    </div>
+  </footer>
+  
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+  
+  <script src="/js/main.js"></script>
+  
+
+</body>
+</html>
+

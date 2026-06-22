@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hexo 8.1.2">
+  <title>Next.js 全栈开发：从项目搭建到部署 - 金兔丁农场</title>
+  <meta name="description" content="为什么选择 Next.jsNext.js 是目前最流行的 React 全栈框架。 核心特性 文件系统路由 服务端渲染 SSR 静态生成 SSG API 路由 中间件支持  项目结构设计合理的项目结构是长期维护的基础。 推荐的目录结构src&#x2F; ├── app&#x2F;          # App Router ├── components&#x2F;   # 共享组件 ├── lib&#x2F;          # 工具函">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Next.js 全栈开发：从项目搭建到部署">
+<meta property="og:url" content="http://example.com/2023/09/10/2023-09-10-Nextjs%E5%85%A8%E6%A0%88%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98/index.html">
+<meta property="og:site_name" content="金兔丁农场">
+<meta property="og:description" content="为什么选择 Next.jsNext.js 是目前最流行的 React 全栈框架。 核心特性 文件系统路由 服务端渲染 SSR 静态生成 SSG API 路由 中间件支持  项目结构设计合理的项目结构是长期维护的基础。 推荐的目录结构src&#x2F; ├── app&#x2F;          # App Router ├── components&#x2F;   # 共享组件 ├── lib&#x2F;          # 工具函">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-09-09T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-19T20:14:23.774Z">
+<meta property="article:author" content="兔丁老大">
+<meta property="article:tag" content="Next.js   - 全栈   - React">
+<meta name="twitter:card" content="summary">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-default.min.css">
+  
+  <link rel="icon" href="/galleries/icon/avatar.jpg">
+  
+  <script>
+    (function () {
+      var stored = localStorage.getItem('pure-theme-dark-mode');
+      var mode = stored || 'auto';
+      if (mode === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      } else if (mode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+  
+  
+
+</head>
+<body>
+  
+<div class="dark-mode-toggle" id="darkModeToggle" title="Toggle dark mode">
+  <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="5" fill="currentColor"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2"/></svg>
+  <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor"/></svg>
+</div>
+
+
+  <div class="site-wrapper">
+
+<header class="site-header">
+  <div class="header-inner">
+    
+    <a href="/" class="header-home-link">金兔丁农场</a>
+    
+    <div class="header-right">
+      <div class="header-search">
+        <span class="search-icon">
+          <svg viewBox="0 0 24 24" width="16" height="16"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/></svg>
+        </span>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search" autocomplete="off">
+        <div class="search-dropdown" id="searchDropdown"></div>
+      </div>
+      <nav class="header-nav">
+        
+          
+            <a href="/posts">Posts</a>
+          
+            <a href="/categories">Categories</a>
+          
+            <a href="/galleries">Gallery</a>
+          
+        
+      </nav>
+    </div>
+    <button class="mobile-nav-toggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-nav-panel">
+    <nav class="mobile-nav">
+      
+      <a href="/">金兔丁农场</a>
+      
+      
+        
+          <a href="/posts">Posts</a>
+        
+          <a href="/categories">Categories</a>
+        
+          <a href="/galleries">Gallery</a>
+        
+      
+    </nav>
+  </div>
+</header>
+
+<main class="site-main">
+  <article class="post-article">
+  <div class="container">
+    <header class="post-header">
+      <h1 class="post-title">Next.js 全栈开发：从项目搭建到部署</h1>
+      <div class="post-meta">
+        <time datetime="2023-09-10">2023-09-10</time>
+        
+        <span class="post-categories">
+          
+          <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/">技术分享</a>
+          
+        </span>
+        
+        
+        <span class="post-tags">
+          
+          <a href="/tags/Next-js-%E5%85%A8%E6%A0%88-React/">#Next.js   - 全栈   - React</a>
+          
+        </span>
+        
+      </div>
+    </header>
+
+    <div class="post-body-wrapper">
+      <div class="post-content">
+        <h2 id="为什么选择-Next-js"><a href="#为什么选择-Next-js" class="headerlink" title="为什么选择 Next.js"></a>为什么选择 Next.js</h2><p>Next.js 是目前最流行的 React 全栈框架。</p>
+<h3 id="核心特性"><a href="#核心特性" class="headerlink" title="核心特性"></a>核心特性</h3><ol>
+<li>文件系统路由</li>
+<li>服务端渲染 SSR</li>
+<li>静态生成 SSG</li>
+<li>API 路由</li>
+<li>中间件支持</li>
+</ol>
+<h2 id="项目结构设计"><a href="#项目结构设计" class="headerlink" title="项目结构设计"></a>项目结构设计</h2><p>合理的项目结构是长期维护的基础。</p>
+<h3 id="推荐的目录结构"><a href="#推荐的目录结构" class="headerlink" title="推荐的目录结构"></a>推荐的目录结构</h3><p><code>src/ ├── app/          # App Router ├── components/   # 共享组件 ├── lib/          # 工具函数 └── styles/       # 样式文件</code></p>
+<h3 id="路由设计"><a href="#路由设计" class="headerlink" title="路由设计"></a>路由设计</h3><p>Next.js 13+ 使用 App Router，目录结构即路由。</p>
+<p><code>	ypescript // app/posts/[slug]/page.tsx export default function PostPage({ params }) {   return &lt;div&gt;Post: {params.slug}&lt;/div&gt;; } </code></p>
+<h2 id="数据获取策略"><a href="#数据获取策略" class="headerlink" title="数据获取策略"></a>数据获取策略</h2><p>根据内容特性选择合适的渲染方式。</p>
+<h3 id="静态生成-vs-服务端渲染"><a href="#静态生成-vs-服务端渲染" class="headerlink" title="静态生成 vs 服务端渲染"></a>静态生成 vs 服务端渲染</h3><p>内容不变的页面用 SSG，个性化内容用 SSR。</p>
+<h3 id="ISR-增量静态再生"><a href="#ISR-增量静态再生" class="headerlink" title="ISR 增量静态再生"></a>ISR 增量静态再生</h3><p>结合 SSG 和 SSR 的优势，定时更新静态页面。</p>
+<blockquote>
+<p>选择渲染策略的关键是：内容多久更新一次？</p>
+</blockquote>
+
+      </div>
+      <aside class="post-toc" id="postToc">
+        <div class="toc-title">目录</div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%89%E6%8B%A9-Next-js"><span class="toc-text">为什么选择 Next.js</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E7%89%B9%E6%80%A7"><span class="toc-text">核心特性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E7%BB%93%E6%9E%84%E8%AE%BE%E8%AE%A1"><span class="toc-text">项目结构设计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8E%A8%E8%8D%90%E7%9A%84%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84"><span class="toc-text">推荐的目录结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B7%AF%E7%94%B1%E8%AE%BE%E8%AE%A1"><span class="toc-text">路由设计</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E8%8E%B7%E5%8F%96%E7%AD%96%E7%95%A5"><span class="toc-text">数据获取策略</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9D%99%E6%80%81%E7%94%9F%E6%88%90-vs-%E6%9C%8D%E5%8A%A1%E7%AB%AF%E6%B8%B2%E6%9F%93"><span class="toc-text">静态生成 vs 服务端渲染</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ISR-%E5%A2%9E%E9%87%8F%E9%9D%99%E6%80%81%E5%86%8D%E7%94%9F"><span class="toc-text">ISR 增量静态再生</span></a></li></ol></li></ol>
+      </aside>
+    </div>
+
+    
+  </div>
+</article>
+
+</main>
+  </div><!-- .site-wrapper -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p>&copy; 2024 - 2026 Your Name. All Rights Reserved.</p>
+      <p class="footer-powered">由 <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; Pure Theme</p>
+    </div>
+  </footer>
+  
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+  
+  <script src="/js/main.js"></script>
+  
+
+</body>
+</html>
+

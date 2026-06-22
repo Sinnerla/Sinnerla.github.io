@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="generator" content="Hexo 8.1.2">
+  <title>React Hooks 深入理解：从入门到自定义 - 金兔丁农场</title>
+  <meta name="description" content="为什么需要 HooksHooks 让函数组件也能拥有状态和生命周期能力。 Class 组件的问题 复杂组件难以拆分 this 绑定困扰 逻辑复用困难  Hooks 的优势逻辑可以按关注点分离，而不是按生命周期方法分离。 核心 Hooks 详解掌握这几个 Hook，就能应对大部分场景。 useStatejsx const [count, setCount] &#x3D; useState(0);  更新函数可">
+<meta property="og:type" content="article">
+<meta property="og:title" content="React Hooks 深入理解：从入门到自定义">
+<meta property="og:url" content="http://example.com/2020/07/20/2020-07-20-React-Hooks%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3/index.html">
+<meta property="og:site_name" content="金兔丁农场">
+<meta property="og:description" content="为什么需要 HooksHooks 让函数组件也能拥有状态和生命周期能力。 Class 组件的问题 复杂组件难以拆分 this 绑定困扰 逻辑复用困难  Hooks 的优势逻辑可以按关注点分离，而不是按生命周期方法分离。 核心 Hooks 详解掌握这几个 Hook，就能应对大部分场景。 useStatejsx const [count, setCount] &#x3D; useState(0);  更新函数可">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-19T20:14:23.750Z">
+<meta property="article:author" content="兔丁老大">
+<meta property="article:tag" content="React   - Hooks   - 前端">
+<meta name="twitter:card" content="summary">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-default.min.css">
+  
+  <link rel="icon" href="/galleries/icon/avatar.jpg">
+  
+  <script>
+    (function () {
+      var stored = localStorage.getItem('pure-theme-dark-mode');
+      var mode = stored || 'auto';
+      if (mode === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      } else if (mode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
+  
+  
+
+</head>
+<body>
+  
+<div class="dark-mode-toggle" id="darkModeToggle" title="Toggle dark mode">
+  <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="5" fill="currentColor"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2"/></svg>
+  <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="currentColor"/></svg>
+</div>
+
+
+  <div class="site-wrapper">
+
+<header class="site-header">
+  <div class="header-inner">
+    
+    <a href="/" class="header-home-link">金兔丁农场</a>
+    
+    <div class="header-right">
+      <div class="header-search">
+        <span class="search-icon">
+          <svg viewBox="0 0 24 24" width="16" height="16"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/></svg>
+        </span>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search" autocomplete="off">
+        <div class="search-dropdown" id="searchDropdown"></div>
+      </div>
+      <nav class="header-nav">
+        
+          
+            <a href="/posts">Posts</a>
+          
+            <a href="/categories">Categories</a>
+          
+            <a href="/galleries">Gallery</a>
+          
+        
+      </nav>
+    </div>
+    <button class="mobile-nav-toggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-nav-panel">
+    <nav class="mobile-nav">
+      
+      <a href="/">金兔丁农场</a>
+      
+      
+        
+          <a href="/posts">Posts</a>
+        
+          <a href="/categories">Categories</a>
+        
+          <a href="/galleries">Gallery</a>
+        
+      
+    </nav>
+  </div>
+</header>
+
+<main class="site-main">
+  <article class="post-article">
+  <div class="container">
+    <header class="post-header">
+      <h1 class="post-title">React Hooks 深入理解：从入门到自定义</h1>
+      <div class="post-meta">
+        <time datetime="2020-07-20">2020-07-20</time>
+        
+        <span class="post-categories">
+          
+          <a href="/categories/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/">技术分享</a>
+          
+        </span>
+        
+        
+        <span class="post-tags">
+          
+          <a href="/tags/React-Hooks-%E5%89%8D%E7%AB%AF/">#React   - Hooks   - 前端</a>
+          
+        </span>
+        
+      </div>
+    </header>
+
+    <div class="post-body-wrapper">
+      <div class="post-content">
+        <h2 id="为什么需要-Hooks"><a href="#为什么需要-Hooks" class="headerlink" title="为什么需要 Hooks"></a>为什么需要 Hooks</h2><p>Hooks 让函数组件也能拥有状态和生命周期能力。</p>
+<h3 id="Class-组件的问题"><a href="#Class-组件的问题" class="headerlink" title="Class 组件的问题"></a>Class 组件的问题</h3><ol>
+<li>复杂组件难以拆分</li>
+<li>this 绑定困扰</li>
+<li>逻辑复用困难</li>
+</ol>
+<h3 id="Hooks-的优势"><a href="#Hooks-的优势" class="headerlink" title="Hooks 的优势"></a>Hooks 的优势</h3><p>逻辑可以按关注点分离，而不是按生命周期方法分离。</p>
+<h2 id="核心-Hooks-详解"><a href="#核心-Hooks-详解" class="headerlink" title="核心 Hooks 详解"></a>核心 Hooks 详解</h2><p>掌握这几个 Hook，就能应对大部分场景。</p>
+<h3 id="useState"><a href="#useState" class="headerlink" title="useState"></a>useState</h3><p><code>jsx const [count, setCount] = useState(0); </code></p>
+<p>更新函数可以接收前一个值：setCount(prev &#x3D;&gt; prev + 1)</p>
+<h3 id="useEffect"><a href="#useEffect" class="headerlink" title="useEffect"></a>useEffect</h3><p>处理副作用：数据请求、订阅、DOM 操作。</p>
+<p><code>jsx useEffect(() =&gt; {   document.title = Count: ;   return () =&gt; { /* 清理逻辑 */ }; }, [count]); </code></p>
+<h3 id="useRef"><a href="#useRef" class="headerlink" title="useRef"></a>useRef</h3><p>在多次渲染之间保持引用不变。</p>
+<h2 id="自定义-Hook"><a href="#自定义-Hook" class="headerlink" title="自定义 Hook"></a>自定义 Hook</h2><p>把可复用的逻辑抽成自定义 Hook，是 Hooks 的精髓。</p>
+<h3 id="useWindowSize-示例"><a href="#useWindowSize-示例" class="headerlink" title="useWindowSize 示例"></a>useWindowSize 示例</h3><p><code>jsx function useWindowSize() {   const [size, setSize] = useState({w: 0, h: 0});   useEffect(() =&gt; {     const fn = () =&gt; setSize({w: window.innerWidth, h: window.innerHeight});     window.addEventListener(&#39;resize&#39;, fn);     return () =&gt; window.removeEventListener(&#39;resize&#39;, fn);   }, []);   return size; } </code></p>
+<blockquote>
+<p>自定义 Hook 的命名必须以 use 开头。</p>
+</blockquote>
+
+      </div>
+      <aside class="post-toc" id="postToc">
+        <div class="toc-title">目录</div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81-Hooks"><span class="toc-text">为什么需要 Hooks</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Class-%E7%BB%84%E4%BB%B6%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">Class 组件的问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Hooks-%E7%9A%84%E4%BC%98%E5%8A%BF"><span class="toc-text">Hooks 的优势</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83-Hooks-%E8%AF%A6%E8%A7%A3"><span class="toc-text">核心 Hooks 详解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#useState"><span class="toc-text">useState</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#useEffect"><span class="toc-text">useEffect</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#useRef"><span class="toc-text">useRef</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89-Hook"><span class="toc-text">自定义 Hook</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#useWindowSize-%E7%A4%BA%E4%BE%8B"><span class="toc-text">useWindowSize 示例</span></a></li></ol></li></ol>
+      </aside>
+    </div>
+
+    
+  </div>
+</article>
+
+</main>
+  </div><!-- .site-wrapper -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p>&copy; 2024 - 2026 Your Name. All Rights Reserved.</p>
+      <p class="footer-powered">由 <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; Pure Theme</p>
+    </div>
+  </footer>
+  
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+  
+  <script src="/js/main.js"></script>
+  
+
+</body>
+</html>
+
